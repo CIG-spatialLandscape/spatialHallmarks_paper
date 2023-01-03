@@ -1,0 +1,19 @@
+
+
+
+
+
+
+for sample in ../out/*; do
+  python run_STARCH.py --gene_mapping_file_name hgTables_hg38.txt -i ../M3/${sample}.txt --output name --n_clusters 4 --outdir ../out/${sample}/ -p Visium
+done
+
+
+
+python run_STARCH.py --gene_mapping_file_name hgTables_hg38.txt -i ../M3/input_starch.txt --output name --n_clusters 4 --outdir ../M3/ -p Visium
+
+
+for sample in *; do  
+    python ../STARCH/run_STARCH.py --gene_mapping_file_name ../STARCH/hgTables_hg38.txt -i ../input/${sample}.txt --output name --n_clusters 3 --outdir ${sample}/ -p Visium; 
+done
+

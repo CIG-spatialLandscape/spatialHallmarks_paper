@@ -6,7 +6,10 @@
 ##################################################
 
 library(tidyverse)
-library(tidyr)
+library(stringr)
+library(Seurat)
+library(ComplexHeatmap)
+library(circlize)
 
 #extract all samples names from files
 files <- list.files("", full.names = F)

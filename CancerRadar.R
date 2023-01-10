@@ -24,7 +24,7 @@ coord <- coord[spot_info$spotid,]
 #add real coordinates to sub-spots
 source("../utils/CoordinatesEnhanced.R")
 coord <- subspot_coord(coord)
-##
+
 tme_spots <- spot_info$spotid[spot_info$clusters %in% c(4,5)]
 cancer_spots <- spot_info$spotid[spot_info$clusters %in% c(1,2)]
 #compute distances across TME and Cancer spots

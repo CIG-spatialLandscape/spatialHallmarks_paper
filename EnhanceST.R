@@ -4,6 +4,7 @@
 ## Date: 22/12/2022
 ## Author: Sergi Cervilla & Mustafa Sibai
 ##################################################
+library(BayesSpace)
 
 #signle cell experiment object at spot level
 input_file <- "" 

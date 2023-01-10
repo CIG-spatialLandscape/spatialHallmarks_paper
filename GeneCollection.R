@@ -7,7 +7,7 @@
 
 
 library(tidyverse)
-library(dplyr)
+library(stringr)
 library(VennDiagram)
 
 # New PathwayCommons database

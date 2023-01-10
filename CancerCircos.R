@@ -6,12 +6,17 @@
 ##################################################
 
 library(circlize)
-library(dplyr)
 library(paletteer)
-library(caret)
 library(dplyr)
 library(treeshap)
 library(stringr)
+library(Seurat)
+library(ggplot2)
+library(ggpubr)
+library(ComplexHeatmap)
+library(gridBase)
+library(UpSetR)
+library(scales)
 
 ############################## prediction of cancer compartment ###################
 
@@ -362,7 +367,7 @@ lgd_resp = Legend(title = "Response", at = names(col_response),
 lgd_sample = Legend(title = "Sample", at = names(col_sample),
                     legend_gp = gpar(fill = col_sample))
 
-library(gridBase)
+
 circos.clear()
 dev.off()
 plot.new()
@@ -522,7 +527,7 @@ write.table(RF_Imp_direction, "")
 ################# General circos with boxplots ###################
 
 # get the approporitate importance fractions dataframe
-library(reshape2)
+
 RF_Imp.t <- RF_Imp.mt.hmap[,c(1:8, 10, 12, 13)]
 RF_Imp.t$response <- factor(RF_Imp.t$response, levels = c("H0", "H11", "H12", "H2", "H4", "H8"))
 RF_Imp.t <- arrange(RF_Imp.t, response, type)
@@ -532,7 +537,7 @@ RF_Imp.t$ID <- paste0(RF_Imp.t$sample, "_", RF_Imp.t$variable)
 RF_Imp.t$sample <- NULL
 
 # wide
-library(tidyr)
+
 RF_Imp.t.wide <- spread(RF_Imp.t, response, value)
 
 RF_Imp.t.wide <- arrange(RF_Imp.t.wide, variable, type)
@@ -540,7 +545,7 @@ RF_Imp.t.wide <- arrange(RF_Imp.t.wide, variable, type)
 RF_Imp.t.wide <- RF_Imp.t.wide[,-1] %>% group_by(type, variable) %>% summarise_all(mean)
 
 # get the appropriate importance directions dataframe
-library(reshape2)
+
 RF_Dir.t <- RF_Imp.mt.hmap[,c(1, 14:20, 10, 12, 13)]
 RF_Dir.t$response <- factor(RF_Dir.t$response, levels = c("H0", "H11", "H12", "H2", "H4", "H8"))
 RF_Dir.t <- arrange(RF_Dir.t, response, type)
@@ -551,7 +556,7 @@ RF_Dir.t$ID <- paste0(RF_Dir.t$sample, "_", RF_Dir.t$variable)
 RF_Dir.t$sample <- NULL
 
 # wide
-library(tidyr)
+
 RF_Dir.t.wide <- spread(RF_Dir.t, response, value)
 
 RF_Dir.t.wide <- arrange(RF_Dir.t.wide, variable, type)
@@ -661,10 +666,10 @@ circos.track(ylim = range(RF_Imp.t), panel.fun = function(x, y) {
 }, cell.padding = c(0.02, 0, 0.02, 0))
 
 ### legends
-library(ComplexHeatmap)
+
 lgd_dir = Legend(title = "Feature Dependency", col_fun =  col_fun2)
 
-library(gridBase)
+
 circos.clear()
 dev.off()
 plot.new()
@@ -842,7 +847,7 @@ x = list("H1_link" = filter(TME_link, link == "H1_link")$type,
 )
 
 #ggVennDiagram(x, label = "count", edge_size = 2, label_geom = "text") + scale_fill_distiller(palette = "RdYlBu")
-library(UpSetR)
+
 upset(fromList(x), nsets = 7, sets.x.label = "Total = 26 samples", text.scale = 2)
 
 
@@ -1020,7 +1025,7 @@ ggboxplot(freq_pan_2, x="variable", y = "value") +
   stat_compare_means()
 
 ## use this for plot
-library(ggpubr)
+
 ggplot(freq_pan_2, aes(x = variable, y = value, fill = dir)) +
   geom_boxplot(outlier.size = 0) +
   geom_point(pch = 21, position = position_jitterdodge()) +

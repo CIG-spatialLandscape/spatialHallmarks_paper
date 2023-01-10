@@ -6,6 +6,10 @@
 ##################################################
 
 library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(colorspace)
+
 ### list files with pathway scores
 files <- list.files("", pattern = ".txt" ,recursive = F)
 #Pan-Cancer pathways within TME sub-spots

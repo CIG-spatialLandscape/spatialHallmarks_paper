@@ -6,12 +6,18 @@
 ##################################################
 
 library(circlize)
-library(dplyr)
 library(paletteer)
-library(caret)
 library(dplyr)
 library(treeshap)
 library(stringr)
+library(Seurat)
+library(ggplot2)
+library(ggpubr)
+library(ComplexHeatmap)
+library(gridBase)
+library(UpSetR)
+library(scales)
+
 ############################## prediction of TME compartment ###################
 
 RF <- list()
@@ -337,7 +343,7 @@ circos.heatmap(RF_response, col = col_response, track.height = 0.05)
 
 
 ### legends
-library(ComplexHeatmap)
+
 lgd_Imp = Legend(title = "Fraction of Importances", col_fun = col_fun1)
 lgd_dir = Legend(title = "Feature Dependency", col_fun =  col_fun2)
 lgd_R = Legend(title = "R2", col_fun = col_fun3)
@@ -347,7 +353,7 @@ lgd_resp = Legend(title = "Response", at = names(col_response),
 lgd_sample = Legend(title = "Sample", at = names(col_sample),
                     legend_gp = gpar(fill = col_sample))
 
-library(gridBase)
+
 circos.clear()
 dev.off()
 plot.new()
@@ -501,7 +507,7 @@ write.table(RF_Imp_direction, "")
 ################# General circos with boxplots ###################
 
 # get the approporitate importance fractions dataframe
-library(reshape2)
+
 RF_Imp.t <- RF_Imp.mt.hmap[,c(1:7, 9, 11, 12)]
 RF_Imp.t$response <- factor(RF_Imp.t$response, levels = c("H1", "H13", "H3", "H5", "H6", "H7", "H9"))
 RF_Imp.t <- arrange(RF_Imp.t, response, type)
@@ -511,7 +517,7 @@ RF_Imp.t$ID <- paste0(RF_Imp.t$sample, "_", RF_Imp.t$variable)
 RF_Imp.t$sample <- NULL
 
 # wide
-library(tidyr)
+
 RF_Imp.t.wide <- spread(RF_Imp.t, response, value)
 
 RF_Imp.t.wide <- arrange(RF_Imp.t.wide, variable, type)
@@ -520,7 +526,7 @@ RF_Imp.t.wide <- RF_Imp.t.wide[,-1] %>% group_by(type, variable) %>% summarise_a
 
 
 # get the approporitate importance directions dataframe
-library(reshape2)
+
 RF_Dir.t <- RF_Imp.mt.hmap[,c(1, 13:18, 9, 11, 12)]
 RF_Dir.t$response <- factor(RF_Dir.t$response, levels = c("H1", "H13", "H3", "H5", "H6", "H7", "H9"))
 RF_Dir.t <- arrange(RF_Dir.t, response, type)
@@ -531,7 +537,7 @@ RF_Dir.t$ID <- paste0(RF_Dir.t$sample, "_", RF_Dir.t$variable)
 RF_Dir.t$sample <- NULL
 
 # wide
-library(tidyr)
+
 RF_Dir.t.wide <- spread(RF_Dir.t, response, value)
 
 RF_Dir.t.wide <- arrange(RF_Dir.t.wide, variable, type)
@@ -649,10 +655,10 @@ circos.track(ylim = range(RF_Imp.t), panel.fun = function(x, y) {
 }, cell.padding = c(0.02, 0, 0.02, 0))
 
 ### legends
-library(ComplexHeatmap)
+
 lgd_dir = Legend(title = "Feature Dependency", col_fun =  col_fun2)
 
-library(gridBase)
+
 circos.clear()
 dev.off()
 plot.new()

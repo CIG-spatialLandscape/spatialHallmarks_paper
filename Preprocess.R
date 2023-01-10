@@ -10,6 +10,7 @@ library(dplyr)
 library(Seurat)
 library(patchwork)
 library(BayesSpace)
+library(ggplot2)
 
 
 #create directory to store figures

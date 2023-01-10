@@ -9,6 +9,9 @@ library(pheatmap)
 library(paletteer)
 library(estimate)
 library(dplyr)
+library(Seurat)
+library(ggpubr)
+library(ClassDiscovery)
 
 
 
@@ -92,7 +95,6 @@ pheatmap(t(H_EST.mt),
 ################################################################################
 
 #6.5 x 18 inches
-library(ggpubr)
 
 ggboxplot(H_EST, x= "cluster", y = "H12") +stat_compare_means()
 ggboxplot(H_EST, x= "cluster", y = "H11", facet.by = "Anatomic_site", scales = "free")

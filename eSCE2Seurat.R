@@ -4,6 +4,8 @@
 ## Date: 22/12/2022
 ## Author: Sergi Cervilla & Mustafa Sibai
 ##################################################
+library(BayesSpace)
+library(Seurat)
 
 #Load spot level single cell experiment object
 ST_sce <- readRDS("Desktop/IJC/datasets/Public/P8/RDS/P8_sce.rds") 

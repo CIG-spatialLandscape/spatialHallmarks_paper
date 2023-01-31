@@ -115,4 +115,7 @@ Heatmap(t(df_diff), name = "Difference", border = "black", col=col_fun, show_row
         top_annotation =  row_ha,
         left_annotation = top_ha, 
         rect_gp = gpar(col = "gray", lwd = 0.1))
-
+sub_cnv$type <- sapply(sub_cnv$sample, function(x){annotation_tissue[[x]]})
+sub_cnv <- sub_cnv %>% select(H1:H13, cnv_cluster, sample, type)
+write.table(sub_cnv, "Desktop/cnv_spot.txt", sep = "\t")
+write.table(df_diff, "Desktop/cnv_diff.txt", sep = "\t")

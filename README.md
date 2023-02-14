@@ -1,5 +1,5 @@
 # The Pan-Cancer Spatial Landscape of Cancer Hallmarks
-#### Authors: Mustafa Sibai & Sergi Cervilla
+#### Authors: Mustafa Sibai* & Sergi Cervilla*
 Code use for the computation of Cancer Hallmark activities in enhanced Visium samples and the Pan-Cancer analysis
 doi: https://doi.org/10.1101/2022.06.18.496114
 

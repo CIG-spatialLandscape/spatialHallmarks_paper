@@ -42,6 +42,7 @@ doi: https://doi.org/10.1101/2022.06.18.496114
   - **CoordinatesEnhanced.R**: Function to compute the real distance between sub-spots
   - **SamplesMetadata.R**: Variables with metadata and full names for hallmarks and samples
   - **PlottingMod.R**: Modifications of BayesSpace and Seurat plotting to combine and plot high resolution sub-spot plots
+  - **annotLook.txt**: Gene type annotation look up table
   - **header.txt**: Header template for GCT files
 - **Plots** 
   - **CreateHiresFiles.R**: Create files to plot high resolution images with enhanced BayesSpace spots

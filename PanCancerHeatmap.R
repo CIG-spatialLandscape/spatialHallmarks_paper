@@ -92,99 +92,27 @@ pheatmap(t(H_EST.mt),
 
 
 
-################################################################################
-
-#6.5 x 18 inches
-
-ggboxplot(H_EST, x= "cluster", y = "H12") +stat_compare_means()
-ggboxplot(H_EST, x= "cluster", y = "H11", facet.by = "Anatomic_site", scales = "free")
-ggboxplot(H_EST, x= "cluster", y = "H13", facet.by = "embedding_method", scales = "free")+stat_compare_means()
+#
 
 
-
-
-
-################################################################################
-annotation_compartments <- sapply(rownames(ann_heatmap), function(cluster){
-  if (ann_heatmap[cluster, "fit"] == 3 & ann_heatmap[cluster, "Kmeans"] == 2)  return("Cancer")
-  else if (ann_heatmap[cluster, "fit"] == 2 & ann_heatmap[cluster, "Kmeans"] == 1) return("TME")
-  else (return("Buffer"))
-})
-
-saveRDS(annotation_compartments, "")
-annotation_compartments <- readRDS("")
-
-#### boxplots
-
-data <- t(H_EST.mt)
-
-distance_mat <- ClassDiscovery::distanceMatrix(data, metric = "pearson")
+distance_mat <- ClassDiscovery::distanceMatrix(t(H_EST.mt), metric = "pearson")
 Hierar_cl <- hclust(distance_mat, method = "average")
 
-plot(Hierar_cl)
+fit <- cutree(Hierar_cl, k = 2)
 
-fit <- cutree(Hierar_cl, k = 3)
-fit
-rect.hclust(Hierar_cl, k=3, border="green")
-
-
-
-H_EST$fit <- fit
-
-H_EST$scores <- df_BS[rownames(H_EST),3]
-
-ggboxplot(H_EST, x = "fit", y = "scores")
+t <- table(sapply(spot_info$sample, function(x) {
+  rep(annotation_method[[x]], )
+}), fit)[-4,]
+t
+fisher.test(t, )
+chisq.test(t)
 
 
-write.table(H_EST, "", quote = F, row.names = F, sep = "\t")
+t <- table(sapply(spot_info$sample, function(x) {
+  rep(annotation_tissue[[x]], )
+}), fit)[-4,]
+t
+fisher.test(t )
+chisq.test(t)
 
-######################## max and min activity per sample for each hallmark ###############
-H_stats <- data.frame(tumor = rep(unique(H_EST$tumor), each = 2),
-                      stat = bind_rows(rep(list(tibble(stat = c("Max", "Min"))), 41)))
 
-for (hallmark in paste0("H", 1:13)) {
-  H_stats[,hallmark] <- ""
-}
-
-for(sample in unique(H_EST$tumor)) {
-  table <- filter(H_EST, tumor == sample)
-  for (hallmark in paste0("H", 1:13)){
-    for(c in 1:nrow(table)){
-      if (table[c,hallmark] == max(table[,hallmark])) {
-        H_stats[H_stats$tumor == sample & H_stats$stat == "Max",][hallmark] <- table[c, "cluster"]
-      } else if (table[c,hallmark] == min(table[,hallmark])){
-        H_stats[H_stats$tumor == sample & H_stats$stat == "Min",][hallmark] <- table[c, "cluster"]
-      }
-    }
-  }
-}
-
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H1))) +title("H1")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H2))) +title("H2")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H3))) +title("H3")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H4))) +title("H4")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H5))) +title("H5")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H6))) +title("H6")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H7))) +title("H7")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H8))) +title("H8")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H9))) +title("H9")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H10))) +title("H10")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H11))) +title("H11")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H12))) +title("H12")
-barplot(table(as.numeric(H_stats[H_stats$stat=="Max",]$H13))) +title("H13")
-
-H1.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H1 == "5",]$tumor # in 5
-H2.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H2 == "1",]$tumor # in 1
-H3.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H3 == "5",]$tumor # in 5
-H4.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H4 == "1",]$tumor # in 1
-H5.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H5 == "5",]$tumor # in 5
-H6.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H6 == "5",]$tumor # in 5
-H7.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H7 == "5",]$tumor # in 5
-H8.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H8 == "1",]$tumor # in 1
-H9.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H9 == "5",]$tumor # in 5
-H10.samples.max.1 <- H_stats[H_stats$stat == "Max" & H_stats$H10 == "1",]$tumor # in 1
-H10.samples.max.4 <- H_stats[H_stats$stat == "Max" & H_stats$H10 == "4",]$tumor # in 4
-H11.samples.max.1 <- H_stats[H_stats$stat == "Max" & H_stats$H11 == "1",]$tumor # in 1
-H11.samples.max.5 <- H_stats[H_stats$stat == "Max" & H_stats$H11 == "5",]$tumor # in 5
-H12.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H12 == "1",]$tumor # in 1
-H13.samples.max <- H_stats[H_stats$stat == "Max" & H_stats$H13 == "5",]$tumor # in 5

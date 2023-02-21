@@ -18,7 +18,7 @@ df_plot <- df
 
 df_plot <- df %>% group_by(type) %>% dplyr::count()
 
-ggplot(df_plot, aes(x=type, fill=method)) + geom_bar() + theme_classic() + 
+ggplot(df, aes(x=type, fill=method)) + geom_bar() + theme_classic() + 
   scale_y_continuous(breaks= pretty_breaks()) + 
   labs(x="Tumor type", y="Number of samples", fill="Embedding Method") + 
   scale_fill_manual(values = Seurat::DiscretePalette(15, palette = "polychrome")[c(11, 14)])

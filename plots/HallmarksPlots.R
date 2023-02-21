@@ -488,47 +488,36 @@ hires + geom_polygon(data=v,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot,
 dev.off()
 #### P6c4 
 #load sub-spot data of all samples
-spot_info <- read.table("")
+spot_info <- read.table("Desktop/df_cnv.txt")
 sample <- "M3"
 print(sample)
-h_cancer <- "H10"
+h_cancer <- "H11"
 h_tme <- "H3"
 #single cell experiment enhanced object without imputed genes
-sce <- readRDS("")
+sce <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/RDS_final/M3_sce_enhanced.rds")
 sce <- sce[,-1]
 colData(sce)[, c(h_cancer, h_tme, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, h_tme, "clusters")]
 
-v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2),], fill = h_cancer)
+v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2, 3),], fill = h_cancer)
 v2 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(4,5),], fill = h_tme)
-v3 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(3),], fill = "clusters")
 
 #spot location
-ref_v <- readRDS("")
+ref_v <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/bayes/M3.rds")
 #image
-hires <- readRDS("")
+hires <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/image/M3.rds")
 for (spot in unique(v$spot)) {
   v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
   v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
 }
 
 
-for (spot in unique(v2$spot)) {
-  v2$imagecol[v2$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v2$imagerow[v2$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
 
-for (spot in unique(v3$spot)) {
-  v3$imagecol[v3$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v3$imagerow[v3$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
 #save file 
-pdf("", width = 7, height = 7) 
+pdf("Desktop/IJC/datasets/IGTP/figuresPaper/Final/M3.pdf", width = 7, height = 7) 
 hires + geom_polygon(data=v,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
   scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) + 
   ggnewscale::new_scale("fill") + geom_polygon(data=v2,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-  scale_fill_gradientn(h_tme, colours = viridisLite::mako(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) + 
-  ggnewscale::new_scale("fill") + geom_polygon(data=v3,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~as.factor(fill))) +
-  scale_fill_manual("Buffer", values = "gray41") 
+  scale_fill_gradientn(h_tme, colours = viridisLite::mako(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) 
 dev.off()
 ### P7
 #### P7a 
@@ -656,3 +645,64 @@ for (pathway in pathways) {
   ggtitle(str_split(pathway, pattern = "_", simplify = T)[1,2])
   dev.off()
 }
+
+
+
+
+###########
+
+#load sub-spot data of all samples
+spot_info <- read.table("Desktop/df_cnv.txt")
+sample <- "Co1"
+h_cancer <- "H4"
+#single cell experiment enhanced object without imputed genes
+sce <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/RDS_final/Co1_sce_enhanced.rds")
+sce <- sce[,-1]
+colData(sce)[, c(h_cancer, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, "clusters")]
+
+v <- .make_triangle_subspots(colData(sce), fill = h_cancer)
+
+#spot location
+ref_v <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/bayes/Co1.rds")
+#image
+hires <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/image/Co1.rds")
+for (spot in unique(v$spot)) {
+  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+
+
+#save file 
+pdf("Desktop/IJC/datasets/IGTP/figuresPaper/Final/Fig2_H4.pdf", width = 7, height = 7) 
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000])
+dev.off()
+
+spot_info <- read.table("Desktop/df_cnv.txt")
+sample <- "Co1"
+h_cancer <- "H13"
+#single cell experiment enhanced object without imputed genes
+sce <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/RDS_final/Co1_sce_enhanced.rds")
+sce <- sce[,-1]
+colData(sce)[, c(h_cancer, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, "clusters")]
+
+v <- .make_triangle_subspots(colData(sce), fill = h_cancer)
+
+#spot location
+ref_v <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/bayes/Co1.rds")
+#image
+hires <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/image/Co1.rds")
+for (spot in unique(v$spot)) {
+  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+
+
+#save file 
+pdf("Desktop/IJC/datasets/IGTP/figuresPaper/Final/Fig2_H13.pdf", width = 7, height = 7) 
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000])
+dev.off()
+
+
+##HALLMARKS 

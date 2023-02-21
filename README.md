@@ -11,11 +11,11 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - Hallmark activity computation
 - ESTIMATE computation
 - Pan-Cancer heatmap
-- Neighborhood computation and linear modeling
-- Random Forest: Radar computation and RF models
 - CNV estimation
+- Random Forest: Radar computation and RF models
 - Pathway activities and correlations
 - Plots
+- Supplementary
 - Utils (Annotation, Plot functions, compute real coordinates...) 
 
 ## Code purpose
@@ -27,8 +27,8 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - **mat2GCT.sh**: Tranform expression matrix to GCT format
 - **ComputeESTIMATE.R**: Extract enhanced expression matrix and compute ESTIMATE scores
 - **PanCancerHeatmap.R**: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
-- **ComputeNeighborsScores.R**: Compute Neighborhood score for each sub-spot and create a dataframe alongside hallmark activities
-- **LMNeighborhood.R**: Linear models to predict hallmark activity through estimate and neighborhood scores
+- **SpAutocorrelation**: Compute Moran's for hallmark activities
+- **CNVexperiment.R**: Generate CNV clusters and run CNV experiment
 - **SCD.R**: Compute Spatial Continuity Degree at sub-spot resolution
 - **CancerRadar.R**: Compute TME Radar scores for Cancer spots
 - **TMERadar.R**: Compute Cancer Radar scores for TME spots
@@ -36,13 +36,13 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - **RFTME.R**: Generate Random Forest model to predict a given TME Hallmark in a given sample
 - **CancerCircos.R**: Plot results of Random Forest models for Cancer Hallmarks
 - **TMECircos.R**: Plot results of Random Forest models for TME Hallmarks
-- **CNVexperiment.R**: Generate CNV clusters and run CNV experiment
 - **PathScore.R**: Compute the pathway scores in an enhanced ST object
 - **PathCorrelation.R**: Correlate hallmark activity and pathway scores across all samples
 - **Utils** 
   - **CoordinatesEnhanced.R**: Function to compute the real distance between sub-spots
   - **SamplesMetadata.R**: Variables with metadata and full names for hallmarks and samples
   - **PlottingMod.R**: Modifications of BayesSpace and Seurat plotting to combine and plot high resolution sub-spot plots
+  - **header.txt**: Header template for GCT files
 - **Plots** 
   - **CreateHiresFiles.R**: Create files to plot high resolution images with enhanced BayesSpace spots
   - **HallmarkPlots.R**: Reproduce plots 

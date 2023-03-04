@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Compute Spatial Continuity Degree at sub-spot resolution
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 #!/usr/bin/env Rscript

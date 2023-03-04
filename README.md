@@ -1,6 +1,6 @@
 # Unraveling the spatial architecture of Cancer Hallmarks
 #### Authors: Mustafa Sibai* & Sergi Cervilla*
-** Equal contribution
+ * Equal contribution
 
 Code used for the collection of Cancer Hallmark gene sets and the computation of their activities in enhanced Visium samples with all downstream analysis
 doi: https://doi.org/10.1101/2022.06.18.496114

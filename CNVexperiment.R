@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Generate CNV clusters and run CNV experiment
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 library(tidyverse)

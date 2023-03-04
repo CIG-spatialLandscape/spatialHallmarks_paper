@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Compute Neighborhood score for each sub-spot and create a data frame alongside hallmark activities
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 ## Auxiliary functions

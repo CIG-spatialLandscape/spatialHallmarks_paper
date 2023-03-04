@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Generate Random Forest model to predict a given TME hallmark in a given sample
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 #!/usr/bin/env Rscript

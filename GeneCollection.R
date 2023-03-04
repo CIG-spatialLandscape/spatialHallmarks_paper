@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
   ## Script purpose: Obtain hallmark signatures using Pathway Commons
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 

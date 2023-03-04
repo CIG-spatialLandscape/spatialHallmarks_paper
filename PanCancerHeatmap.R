@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 library(pheatmap)

@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Create a Seurat object from an enhanced SingleCellExperiment object and compute Hallmark activities
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 library(Seurat)

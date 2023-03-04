@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Correlate hallmark activity and pathway scores across all samples
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 library(dplyr)

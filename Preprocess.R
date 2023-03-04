@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Preprocess samples, transform to SingleCellExperiment object and run clustering (example of P8)
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 library(STutility)

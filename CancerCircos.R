@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Plot results of Random Forest models for Cancer Hallmarks
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla * & Mustafa Sibai *
 ##################################################
 
 library(circlize)

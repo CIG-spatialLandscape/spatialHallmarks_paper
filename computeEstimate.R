@@ -1,4 +1,9 @@
-
+##################################################
+## Project: Cancer Hallmarks
+## Script purpose: compute ESTIMATE scores and clusters for averaging hallmark activities
+## Date: 22/12/2022
+## Author: Sergi Cervilla * & Mustafa Sibai *
+##################################################
 
 library(Seurat)
 library(estimate)

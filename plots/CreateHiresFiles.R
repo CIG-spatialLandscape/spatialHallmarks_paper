@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Create files to plot high resolution images with enhanced BayesSpace spots
 ## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 ## Auxiliary functions

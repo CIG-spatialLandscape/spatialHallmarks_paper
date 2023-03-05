@@ -2,7 +2,7 @@
 ## Project: Hallmarks paper
 ## Script purpose: Supplementary Figures
 ## Date: 23/1/2023
-## Author: Sergi Cervilla 
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 library(tidyverse)

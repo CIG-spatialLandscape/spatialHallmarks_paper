@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Variables with metadata and full names for hallmarks and samples
 ## Date: 27/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 #Complete hallmark names

@@ -2,7 +2,7 @@
 ## Project: Cancer Hallmarks
 ## Script purpose: Reproduce plots
 ## Date: 28/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 # Plot outline
 

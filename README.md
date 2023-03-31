@@ -1,7 +1,14 @@
-# The Pan-Cancer Spatial Landscape of Cancer Hallmarks
+
+<h1>
+ <img align="right" src="map.png" alt="Example Image" width="150" height="150">
+ Unraveling the spatial architecture<br />
+  of Cancer Hallmarks
+</h1>
+
 #### Authors: Mustafa Sibai* & Sergi Cervilla*
-Code use for the computation of Cancer Hallmark activities in enhanced Visium samples and the Pan-Cancer analysis
-doi: https://doi.org/10.1101/2022.06.18.496114
+\* Equal contribution
+
+Code used for the collection of Cancer Hallmark gene sets and the computation of their activities in enhanced Visium samples with all downstream analysis <br />
 
 ## Outline
 - SpaceRanger
@@ -11,11 +18,11 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - Hallmark activity computation
 - ESTIMATE computation
 - Pan-Cancer heatmap
-- Neighborhood computation and linear modeling
-- Random Forest: Radar computation and RF models
 - CNV estimation
+- Random Forest: Radar computation and RF models
 - Pathway activities and correlations
 - Plots
+- Supplementary
 - Utils (Annotation, Plot functions, compute real coordinates...) 
 
 ## Code purpose
@@ -26,24 +33,23 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - **HallmarkScores.R**: Script to create a Seurat object from an enhanced SingleCellExperiment object
 - **mat2GCT.sh**: Tranform expression matrix to GCT format
 - **ComputeESTIMATE.R**: Extract enhanced expression matrix and compute ESTIMATE scores
-- **PanCancerHeatmap.R**: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
-- **ComputeNeighborsScores.R**: Compute Neighborhood score for each sub-spot and create a dataframe alongside hallmark activities
-- **LMNeighborhood.R**: Linear models to predict hallmark activity through estimate and neighborhood scores
+- **SpAutocorrelation**: Compute Moran's for hallmark activities
+- **CNVexperiment.R**: Generate CNV clusters and run CNV experiment
 - **SCD.R**: Compute Spatial Continuity Degree at sub-spot resolution
 - **CancerRadar.R**: Compute TME Radar scores for Cancer spots
 - **TMERadar.R**: Compute Cancer Radar scores for TME spots
 - **RFCancer.R**: Generate Random Forest model to predict a given Cancer Hallmark in a given sample
 - **RFTME.R**: Generate Random Forest model to predict a given TME Hallmark in a given sample
-- **CancerCircos.R**: Plot results of Random Forest models for Cancer Hallmarks
-- **TMECircos.R**: Plot results of Random Forest models for TME Hallmarks
-- **CNVexperiment.R**: Generate CNV clusters and run CNV experiment
-- **PathScore.R**: Compute the pathway scores in an enhanced ST object
-- **PathCorrelation.R**: Correlate hallmark activity and pathway scores across all samples
 - **Utils** 
   - **CoordinatesEnhanced.R**: Function to compute the real distance between sub-spots
   - **SamplesMetadata.R**: Variables with metadata and full names for hallmarks and samples
   - **PlottingMod.R**: Modifications of BayesSpace and Seurat plotting to combine and plot high resolution sub-spot plots
+  - **annotLook.txt**: Gene type annotation look up table
+  - **header.txt**: Header template for GCT files
+  - **sample_ID.txt**: table to match samples ID in circos plots
 - **Plots** 
   - **CreateHiresFiles.R**: Create files to plot high resolution images with enhanced BayesSpace spots
   - **HallmarkPlots.R**: Reproduce plots 
-
+  - **PanCancerHeatmap.R**: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
+  - **CancerCircos.R**: Plot results of Random Forest models for Cancer Hallmarks
+  - **TMECircos.R**: Plot results of Random Forest models for TME Hallmarks

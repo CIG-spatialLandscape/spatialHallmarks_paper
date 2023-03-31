@@ -1,4 +1,7 @@
 # Unraveling the spatial architecture of Cancer Hallmarks
+<p align="right">
+  <img src="map.png" alt="Example Image">
+</p>
 #### Authors: Mustafa Sibai* & Sergi Cervilla*
 * Equal contribution
 

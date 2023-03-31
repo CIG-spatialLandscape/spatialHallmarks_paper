@@ -1,9 +1,8 @@
 
 <h1>
+ <img align="right" src="map.png" alt="Example Image" width="150" height="150">
  Unraveling the spatial architecture<br />
   of Cancer Hallmarks
- <img align="right" src="map.png" alt="Example Image" width="150" height="150">
- 
 </h1>
 
 #### Authors: Mustafa Sibai* & Sergi Cervilla*

@@ -1,4 +1,12 @@
-# Unraveling the spatial architecture of Cancer Hallmarks
+
+<h1>
+ Unraveling the spatial architecture<br />
+  of Cancer Hallmarks
+</h1>
+
+<p align="right">
+  <img src="IMAGE_URL" alt="IMAGE_DESCRIPTION" width="100" height="50">
+</p>
 <p align="right">
   <img src="map.png" alt="Example Image" width="150" height="150">
 </p>

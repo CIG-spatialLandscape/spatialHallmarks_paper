@@ -1,6 +1,6 @@
 # Unraveling the spatial architecture of Cancer Hallmarks
 #### Authors: Mustafa Sibai* & Sergi Cervilla*
--* Equal contribution
+* Equal contribution
 
 Code used for the collection of Cancer Hallmark gene sets and the computation of their activities in enhanced Visium samples with all downstream analysis
 doi: https://doi.org/10.1101/2022.06.18.496114
@@ -38,8 +38,6 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - **RFTME.R**: Generate Random Forest model to predict a given TME Hallmark in a given sample
 - **CancerCircos.R**: Plot results of Random Forest models for Cancer Hallmarks
 - **TMECircos.R**: Plot results of Random Forest models for TME Hallmarks
-- **PathScore.R**: Compute the pathway scores in an enhanced ST object
-- **PathCorrelation.R**: Correlate hallmark activity and pathway scores across all samples
 - **Utils** 
   - **CoordinatesEnhanced.R**: Function to compute the real distance between sub-spots
   - **SamplesMetadata.R**: Variables with metadata and full names for hallmarks and samples

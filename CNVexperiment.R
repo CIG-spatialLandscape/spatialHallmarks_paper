@@ -1,8 +1,7 @@
 ##################################################
 ## Project: Cancer Hallmarks
 ## Script purpose: Generate CNV clusters and run CNV experiment
-## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 library(tidyverse)
@@ -30,7 +29,7 @@ for (sample in files) {
 }
 
 ############################
-#Run STARCH (python script)
+#Run STARCH (STARCH_command.sh)
 ############################
 
 #Add CNV clusters to enhanced Visium sub-spots
@@ -97,40 +96,3 @@ test <- sub_cnv %>% group_by(sample, cnv_cluster) %>% summarise(across(H1:H13, m
                                  minH13 = min(H13), maxH13=max(H13), diffH13=max(H13)-min(H13))
 #create a data frame with these hallmark differences
 df_diff <- data.frame(row.names = test$sample, test[, paste0("diffH", c(2,4,8,10,11,12))])
-df_diff["P1",] <- rep(0,6)
-
-## Heatmap plot
-col_fun = colorRamp2(c(0, max(df_diff)), c("white", "red"))
-tissue_annot <- sapply(rownames(df_diff), function(x) {annotation_tissue[[x]]})
-clonal_annot <- sapply(1:nrow(df_diff), function(x){ifelse(sum(df_diff[x, ]) == 0, "Monoclonal", "Polyclonal")})
-col_tissue_map <- setNames(Seurat::DiscretePalette(15, palette = "polychrome") [c(1:3, 5, 6:11)], sort(unique(tissue_annot)))
-
-d <- dist(df_diff[rowSums(df_diff) > 0,])
-clus <- hclust(d, method = "complete")
-plot(clus)
-cutree(clus, 3)
-diff <- c(cutree(clus, 3), setNames(rep(0,12),rownames(df_diff[rowSums(df_diff) == 0,])))
-diff[diff==1] <- "Medium"
-diff[diff==0] <- "Monoclonal"
-diff[diff==2] <- "Low"
-diff[diff==3] <- "High"
-col_diff_map <- setNames(RColorBrewer::brewer.pal(12, "Paired")[c(1,3,5,7)], unique(diff))
-row_ha = HeatmapAnnotation(`Hallmark activity difference` = factor(diff[rownames(df_diff)]),
-                           `Tumor type` = tissue_annot,
-                           col=list(`Tumor type` = col_tissue_map,
-                                    `Hallmark activity difference` = col_diff_map), 
-                           annotation_height = list(`Tumor type` = unit(2, "cm"),
-                                                    `Clonality` = unit(1, "cm")))
-palette <- do.call(c,color_codes[c(2,4,8,10,11,12)])
-names(palette) <- NULL
-top_ha = rowAnnotation(" " = anno_boxplot(df_diff, height = unit(2, "cm"),gp = gpar(fill = palette)))
-
-
-
-pdf("Desktop/IJC/datasets/IGTP/figuresPaper/Final/cnv.pdf", width = 16.5, height = 3)
-Heatmap(t(df_diff), name = "Difference", border = "black", col=col_fun, show_row_names =T, 
-        show_column_names =F,
-        top_annotation =  row_ha, column_split = factor(clonal_annot, levels = c("Polyclonal", "Monoclonal")), cluster_column_slices=F,
-        left_annotation = top_ha, 
-        rect_gp = gpar(col = "gray", lwd = 0.1))
-dev.off()

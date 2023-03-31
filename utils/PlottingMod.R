@@ -1,8 +1,7 @@
 ##################################################
 ## Project: Cancer Hallmarks
 ## Script purpose: Modifications of BayesSpace and Seurat plotting to combine and plot high resolution sub-spot plots
-## Date: 27/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 library(assertthat)
@@ -748,3 +747,167 @@ SpatialFeaturePlot <- function (object, features, images = NULL, crop = TRUE, sl
                      stroke = stroke, interactive = interactive, information = information))
 }
 SpatialColors <- colorRampPalette(colors = rev(x = brewer.pal(n = 11, name = "Spectral")))
+
+circos.dendrogram2 <- function (dend, facing = c("outside", "inside"), max_height = NULL, 
+                                use_x_attr = FALSE, sector.index = get.current.sector.index(), 
+                                track.index = get.current.track.index(), xl=NULL) 
+{
+  os = get.current.sector.index()
+  ot = get.current.track.index()
+  set.current.cell(sector.index, track.index)
+  on.exit(set.current.cell(os, ot))
+  facing = match.arg(facing)[1]
+  if (is.null(max_height)) {
+    max_height = attr(dend, "height")
+  }
+  is.leaf = function(object) {
+    leaf = attr(object, "leaf")
+    if (is.null(leaf)) {
+      FALSE
+    }
+    else {
+      leaf
+    }
+  }
+  use_x_attr = use_x_attr
+  lines_par = function(col = par("col"), lty = par("lty"), 
+                       lwd = par("lwd"), ...) {
+    return(list(col = col, lty = lty, lwd = lwd))
+  }
+  points_par = function(col = par("col"), pch = par("pch"), 
+                        cex = par("cex"), ...) {
+    return(list(col = col, pch = pch, cex = cex))
+  }
+  draw.d = function(dend, max_height, facing = "outside", max_width = 0) {
+    leaf = attr(dend, "leaf")
+    height = attr(dend, "height")
+    midpoint = attr(dend, "midpoint")
+    n = length(dend)
+    xl = numeric(n)
+    yl = numeric(n)
+    for (i in seq_len(n)) {
+      if (use_x_attr) {
+        xl[i] = attr(dend[[i]], "x")
+      }
+      else {
+        if (is.leaf(dend[[i]])) {
+          xl[i] = x[as.character(attr(dend[[i]], "label"))]
+        }
+        else {
+          xl[i] = attr(dend[[i]], "midpoint") + x[as.character(labels(dend[[i]]))[1]]
+        }
+      }
+      yl[i] = attr(dend[[i]], "height")
+    }
+    edge_par_lt = vector("list", n)
+    for (i in seq_len(n)) {
+      edge_par_lt[[i]] = do.call("lines_par", as.list(attr(dend[[i]], 
+                                                           "edgePar")))
+    }
+    node_par = attr(dend, "nodePar")
+    if (!is.null(node_par)) 
+      node_par = do.call("points_par", as.list(attr(dend, 
+                                                    "nodePar")))
+    if (facing == "outside") {
+      if (n == 1) {
+        circos.lines(c(xl[1], xl[1]), max_height - c(yl[1], 
+                                                     height), col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, 
+                     lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+      }
+      else {
+        circos.lines(c(xl[1], xl[1]), max_height - c(yl[1], 
+                                                     height), col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, 
+                     lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+        circos.lines(c(xl[1], (xl[1] + xl[2])/2), max_height - 
+                       c(height, height), col = edge_par_lt[[1]]$col, 
+                     lty = edge_par_lt[[1]]$lty, lwd = edge_par_lt[[1]]$lwd)
+        if (n > 2) {
+          for (i in seq(2, n - 1)) {
+            circos.lines(c(xl[i], xl[i]), max_height - 
+                           c(yl[i], height), col = edge_par_lt[[i]]$col, 
+                         lty = edge_par_lt[[i]]$lty, lwd = edge_par_lt[[i]]$lwd, 
+                         straight = TRUE)
+            circos.lines(c((xl[i - 1] + xl[i])/2, (xl[i] + 
+                                                     xl[i + 1])/2), max_height - c(height, height), 
+                         col = edge_par_lt[[i]]$col, lty = edge_par_lt[[i]]$lty, 
+                         lwd = edge_par_lt[[i]]$lwd)
+          }
+        }
+        circos.lines(c(xl[n], xl[n]), max_height - c(yl[n], 
+                                                     height), col = edge_par_lt[[n]]$col, lty = edge_par_lt[[n]]$lty, 
+                     lwd = edge_par_lt[[n]]$lwd, straight = TRUE)
+        circos.lines(c(xl[n], (xl[n] + xl[n - 1])/2), 
+                     max_height - c(height, height), col = edge_par_lt[[n]]$col, 
+                     lty = edge_par_lt[[n]]$lty, lwd = edge_par_lt[[n]]$lwd)
+      }
+      if (!is.null(node_par)) {
+        circos.points(mean(xl)/2, max_height - height, 
+                      col = node_par$col, pch = node_par$pch, cex = node_par$cex)
+      }
+    }
+    else if (facing == "inside") {
+      if (n == 1) {
+        circos.lines(c(xl[1], xl[1]), c(yl[1], height), 
+                     col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, 
+                     lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+      }
+      else {
+        circos.lines(c(xl[1], xl[1]), c(yl[1], height), 
+                     col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, 
+                     lwd = edge_par_lt[[1]]$lwd, straight = TRUE)
+        circos.lines(c(xl[1], (xl[1] + xl[2])/2), c(height, 
+                                                    height), col = edge_par_lt[[1]]$col, lty = edge_par_lt[[1]]$lty, 
+                     lwd = edge_par_lt[[1]]$lwd)
+        if (n > 2) {
+          for (i in seq(2, n - 1)) {
+            circos.lines(c(xl[i], xl[i]), c(yl[i], height), 
+                         col = edge_par_lt[[i]]$col, lty = edge_par_lt[[i]]$lty, 
+                         lwd = edge_par_lt[[i]]$lwd, straight = TRUE)
+            circos.lines(c((xl[i - 1] + xl[i])/2, (xl[i] + 
+                                                     xl[i + 1])/2), c(height, height), col = edge_par_lt[[i]]$col, 
+                         lty = edge_par_lt[[i]]$lty, lwd = edge_par_lt[[i]]$lwd)
+          }
+        }
+        circos.lines(c(xl[n], xl[n]), c(yl[n], height), 
+                     col = edge_par_lt[[n]]$col, lty = edge_par_lt[[n]]$lty, 
+                     lwd = edge_par_lt[[n]]$lwd, straight = TRUE)
+        circos.lines(c(xl[n], (xl[n] + xl[n - 1])/2), 
+                     c(height, height), col = edge_par_lt[[n]]$col, 
+                     lty = edge_par_lt[[n]]$lty, lwd = edge_par_lt[[n]]$lwd)
+      }
+      if (!is.null(node_par)) {
+        circos.points(mean(xl)/2, height, col = node_par$col, 
+                      pch = node_par$pch, cex = node_par$cex)
+      }
+    }
+    for (i in seq_len(n)) {
+      if (is.leaf(dend[[i]])) {
+        node_par = attr(dend[[i]], "nodePar")
+        if (!is.null(node_par)) 
+          node_par = do.call("points_par", as.list(attr(dend[[i]], 
+                                                        "nodePar")))
+        if (facing == "outside") {
+          if (!is.null(node_par)) {
+            circos.points(xl[i], max_height, col = node_par$col, 
+                          pch = node_par$pch, cex = node_par$cex)
+          }
+        }
+        else if (facing == "inside") {
+          if (!is.null(node_par)) {
+            circos.points(xl[i], 0, col = node_par$col, 
+                          pch = node_par$pch, cex = node_par$cex)
+          }
+        }
+      }
+      else {
+        draw.d(dend[[i]], max_height, facing, max_width)
+      }
+    }
+  }
+  labels = as.character(labels(dend))
+  x = xl
+  names(x) = labels
+  n = length(labels)
+  if (!is.leaf(dend)) 
+    draw.d(dend, max_height, facing, max_width = n)
+}

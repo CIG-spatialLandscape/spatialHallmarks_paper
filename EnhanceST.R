@@ -1,8 +1,7 @@
 ##################################################
 ## Project: Cancer Hallmarks
 ## Script purpose: Use BayesSpace enhancing algorithm in Visium Spatial transcriptomics data
-## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 library(BayesSpace)
 

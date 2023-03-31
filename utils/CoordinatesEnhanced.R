@@ -1,8 +1,7 @@
 ##################################################
 ## Project: Cancer Hallmarks
 ## Script purpose: Function to compute the real distance between sub-spots (utils)
-## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 #Function to compute real distances at sub-spot level

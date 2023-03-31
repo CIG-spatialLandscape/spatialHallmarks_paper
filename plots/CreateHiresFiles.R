@@ -1,8 +1,7 @@
 ##################################################
 ## Project: Cancer Hallmarks
 ## Script purpose: Create files to plot high resolution images with enhanced BayesSpace spots
-## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 ## Auxiliary functions
@@ -22,7 +21,7 @@ new_labels <- function(original, order){
 
 source("../utils/PlottingMod.R")
 
-sample <- "M3"
+sample <- "Breast7"
 #load single cell experiment object at spot level
 ST_sce <- readRDS("")
 #load single cell experiment object at sub-spot level

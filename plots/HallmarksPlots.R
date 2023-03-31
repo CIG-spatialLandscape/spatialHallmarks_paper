@@ -1,50 +1,43 @@
 ##################################################
 ## Project: Cancer Hallmarks
-## Script purpose: Reproduce plots
-## Date: 28/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Script purpose: Reproduce main plots
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
-# Plot outline
 
-## Highlights
+# Main figure plots
 ### P1
-#### P1c: Number of pathways per Hallmark (barplot)
-#### P1d: Number of genes per Hallmark (barplot)
-#### P1e: Number of genes shared by Hallmarks (barplot)
-#### P1f: Hallmark activity and marker expression plots
-##### Pancreas
-##### Liver
-##### Kidney
-##### Colorectal
-##### Breast
-##### Brain
-##### Bladder
+#### P1c: Number of genes per Hallmark (barplot)
+#### P1d: Hallmark activity and marker expression plots
+##### Pancreas, Kidney, Colorectal, Breast, Brain
+#### P1e: Moran's I bridge plots
+
 ### P2 
-#### P2a2: ESTIMATE score in colorectal tissue 
-#### P2a3: ESTIMATE clusters in colorectal tissue 
-#### P2a4: ESTIMATE validation boxplots
-#### P2b: Pan-Cancer heatmap
+#### P2a2: ESTIMATE score in Colorectal tissue 
+#### P2a3: ESTIMATE clusters in Colorectal tissue 
+#### P2b: ESTIMATE validation boxplots
+#### P2c: Pan-Cancer heatmap
+#### P2d: hallmark expression example for Colorectal
+#### P2e: Moran's I bridge plots for each compartment
+
 ### P3
-#### P3b1: ESTIMATEvsNeighborhood (scatterplot)
-#### P3b2: Residual values in colorectal tissue
-#### P3c: R-squared of ESTIMATE+Neighborhood, all hallmarks (barplot)
-#### P3d: R-squared of ESTIMATE+Neighborhood, split by hallmark (circular barplot)
-#### P3e: R-squared of ESTIMATE+Neighborhood, split by hallmark and compartment (layered circular barplot)
+#### P3a: Clonal maximum hallmark activity difference (heatmap)
+#### P3b: Clonal clusters 
+#### P3c: Hallmark activity across clones (boxplot)
+
+### P4
+#### P4b2: estimate clusters in kidney sample
+#### P4b3: avoiding immune destruction in TME for kidney sample
+#### P4b4: avoiding immune destruction radar in neoplastic for kidney sample
+#### P4b5: avoiding immune destruction in TME and evading growth suppressors in neoplastic for kidney sample
+
 ### P5
-#### P5a: Random Forest for Cancer Hallmarks results (circos plot)
-#### P5b: Random Forest for Cancer Hallmarks contributions and dependencies (boxplot)
-#### P5l: Cluster plots for SCD legend
-### P6
-#### P6a: Random Forest for TME Hallmarks results (circos plot)
-#### P6b: Random Forest for TME Hallmarks contributions and dependencies (boxplot)
-#### P6c2: M3 clusters
-#### P6c3: M3 H3-H11
-#### P6c4 : Random H3-H10
-### P7
-#### P7a: Clonal hallmark activity difference (heatmap)
-#### P7b1: Clonal clusters 
-#### P7b2: Hallmark activity across clones (boxplot)
-#### P7c: Pathway activity plots in M3
+#### P5a1: Feature importance to predict Cancer Hallmarks (boxplot)
+#### P5a2: Feature importance to predict TME Hallmarks (boxplot)
+#### P5b1: Stacked feature importance splited by spatial dependency in predicting Cancer Hallmarks (circos plot)
+#### P5b2: Stacked feature importance splited by spatial dependency in predicting TME Hallmarks (circos plot)
+#### P5c1: Random Forest for Cancer Hallmarks results (circos plot)
+#### P5c2: Random Forest for Neoplastic Hallmarks results (circos plot)
+
 
 
 
@@ -55,16 +48,19 @@ library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(ggpubr)
+library(ggridges)
 library(tidyverse)
 library(tidyr)
 library(ComplexHeatmap)
 library(circlize)
+library(ggforce)
+library(scales)
 #path to SamplesMetadata.R file
 source("../utils/SamplesMetadata.R")
 #path to PlottingMod.R file
 source("../utils/PlottingMod.R")
 
-## Highlights
+
 ### P1
 #### P1c (GeneCollection.R)
 paths_freq <- data.frame(table(paths_final$hallmark))
@@ -87,29 +83,23 @@ colnames(H.genes.tbl)[1:2] <- c("Hallmark", "n")
 H.genes.tbl$Hallmark <- factor(H.genes.tbl$Hallmark, levels = paste0("H", 1:13))
 H.genes.tbl <- dplyr::arrange(H.genes.tbl, Hallmark)
 H.genes.tbl$Hallmark <- hallmark_names
-# arrange based on pathway frequency
-H.genes.tbl$Hallmark <- factor(H.genes.tbl$Hallmark, levels = paths_freq$Hallmark)
+H.genes.tbl <- dplyr::arrange(H.genes.tbl, n)
+H.genes.tbl$Hallmark <- factor(H.genes.tbl$Hallmark, levels = H.genes.tbl$Hallmark)
 
-ggbarplot(H.genes.tbl, x = "Hallmark", y = "n", fill = "black", color = "white", width = 0.9) + rotate_x_text(angle = -45, vjust = 2, hjust = 0) +  ylab("n.Genes") 
+ggbarplot(H.genes.tbl, x = "Hallmark", y = "n", fill = "black", color = "white", width = 0.9) +
+  rotate_x_text(angle = -45, vjust = 2, hjust = 0) +  ylab("n.Genes") + coord_flip() + 
+  theme(axis.ticks.y = element_blank())
+ggsave("", bg="white")
 
 
-#### P1e (GeneCollection.R) 
-H.genes.tbl <- data.frame(n_genes = table(H.genes$gene))
-colnames(H.genes.tbl)[1:2] <- c("genes", "HAGs")
-
-H.genes.tbl <- data.frame(table(H.genes.tbl$HAGs))
-colnames(H.genes.tbl)[1:2] <- c("HAGs", "Freq")
-
-ggbarplot(H.genes.tbl, x = "HAGs", y = "Freq", fill = "black", color = "white", width = 0.9) + ylab("n.Genes") + xlab("n. associated Hallmarks per Gene")
-
-#### P1f
-#load spot_info (ComputeNeighborsScores.R)
+#### P1d
+#load spot_info ()
 ##### Pancreas
-sample <- "P306"
+sample <- "Pancreas5"
 #load enhanced object with imputed genes
 sce <- readRDS("")
 sce <- sce[,-1]
-h <- "H11"
+h <- "H11" #senescent cells
 colData(sce)[,h] <- spot_info[spot_info$sample==sample, h]
 
 v <- .make_triangle_subspots(colData(sce), fill = h)
@@ -117,7 +107,7 @@ p <- ggplot()  + geom_polygon(data=v,  aes_(x=~x.vertex, y=~y.vertex, group=~spo
   scale_fill_viridis_c(option = "B") + labs(fill = "") + ggtitle(hallmark_names_list[[h]]) + theme(plot.title = element_text(size=35, hjust = 0.5),
                                                                                                    legend.position = c(1.05,0.3), legend.key.size = unit(1, "cm"))
 #save file 
-pdf(, width = 10, height = 10) 
+pdf("", width = 10, height = 10) 
 plot(p)
 dev.off()
 g <- "TXN"
@@ -131,39 +121,13 @@ pdf("", width = 10, height = 10)
 plot(p)
 dev.off()
 
-##### Liver
-sample <- "HCC2T"
-#load enhanced object with imputed genes
-sce <- readRDS("")
-sce <- sce[,-1]
-h <- "H2"
-colData(sce)[,h] <- spot_info[spot_info$sample==sample, h]
-
-v <- .make_triangle_subspots(colData(sce), fill = h)
-p <- ggplot()  + geom_polygon(data=v,  aes_(x=~x.vertex, y=~y.vertex, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
-  scale_fill_viridis_c(option = "B") + labs(fill = "") + ggtitle(hallmark_names_list[[h]]) + theme(plot.title = element_text(size=35, hjust = 0.5),
-                                                                                                   legend.position = c(1.05,0.3), legend.key.size = unit(1, "cm"))
-#save file 
-pdf("", width = 10, height = 10) 
-plot(p)
-dev.off()
-g <- "CDK1"
-sce$gene <- assay(sce)[g,]
-v <- .make_triangle_subspots(colData(sce), fill = gene)
-p <- ggplot()  + geom_polygon(data=v,  aes_(x=~x.vertex, y=~y.vertex, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
-  scale_fill_viridis_c(option = "B") + labs(fill = "") + ggtitle(g) + theme(plot.title = element_text(size=50, hjust = 0.5),
-                                                                            legend.position = c(1.05,0.3), legend.key.size = unit(1, "cm"))
-#save file 
-pdf("", width = 10, height = 10) 
-plot(p)
-dev.off()
 
 ##### Kidney
-sample <- "C21"
+sample <- "Kidney2"
 #load enhanced object with imputed genes
 sce <- readRDS("")
 sce <- sce[,-1]
-h <- "H1"
+h <- "H1" #Sustaining proliferative signaling
 colData(sce)[,h] <- spot_info[spot_info$sample==sample, h]
 
 v <- .make_triangle_subspots(colData(sce), fill = h)
@@ -186,11 +150,11 @@ plot(p)
 dev.off()
 
 ##### Colorectal
-sample <- "Intestine"
+sample <- "Colorectal8"
 #load enhanced object with imputed genes
 sce <- readRDS("")
 sce <- sce[,-1]
-h <- "H8"
+h <- "H8" #Genome Instability and Mutation
 colData(sce)[,h] <- spot_info[spot_info$sample==sample, h]
 
 v <- .make_triangle_subspots(colData(sce), fill = h)
@@ -213,11 +177,11 @@ plot(p)
 dev.off()
 
 ##### Breast
-sample <- "DuctalFFPE"
+sample <- "Breast4"
 #load enhanced object with imputed genes
 sce <- readRDS("")
 sce <- sce[,-1]
-h <- "H12"
+h <- "H12" #Nonmutational Epigenetic Reporgramming
 colData(sce)[,h] <- spot_info[spot_info$sample==sample, h]
 
 v <- .make_triangle_subspots(colData(sce), fill = h)
@@ -238,12 +202,13 @@ p <- ggplot()  + geom_polygon(data=v,  aes_(x=~x.vertex, y=~y.vertex, group=~spo
 pdf("", width = 10, height = 10) 
 plot(p)
 dev.off()
+
 ##### Glioblastoma
-sample <- "Glioblastoma"
+sample <- "Glioblastoma1"
 #load enhanced object with imputed genes
 sce <- readRDS("")
 sce <- sce[,-1]
-h <- "H10"
+h <- "H10" #Deregulating Cellular Energetics
 colData(sce)[,h] <- spot_info[spot_info$sample==sample, h]
 
 v <- .make_triangle_subspots(colData(sce), fill = h)
@@ -264,41 +229,33 @@ p <- ggplot()  + geom_polygon(data=v,  aes_(x=~x.vertex, y=~y.vertex, group=~spo
 pdf("", width = 10, height = 10) 
 plot(p)
 dev.off()
-##### Bladder
-sample <- "DU2"
-#load enhanced object with imputed genes
-sce <- readRDS("")
-sce <- sce[,-1]
-h <- "H6"
-colData(sce)[,h] <- spot_info[spot_info$sample==sample, h]
 
-v <- .make_triangle_subspots(colData(sce), fill = h)
-p <- ggplot()  + geom_polygon(data=v,  aes_(x=~x.vertex, y=~y.vertex, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
-  scale_fill_viridis_c(option = "B") + labs(fill = "") + ggtitle(hallmark_names_list[[h]]) + theme(plot.title = element_text(size=35, hjust = 0.5),
-                                                                                                   legend.position = c(1.05,0.3), legend.key.size = unit(1, "cm"))
-#save file 
-pdf("", width = 10, height = 10) 
-plot(p)
-dev.off()
-g <- "VCAN"
-sce$gene <- assay(sce)[g,]
-v <- .make_triangle_subspots(colData(sce), fill = gene)
-p <- ggplot()  + geom_polygon(data=v,  aes_(x=~x.vertex, y=~y.vertex, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
-  scale_fill_viridis_c(option = "B") + labs(fill = "") + ggtitle(g) + theme(plot.title = element_text(size=50, hjust = 0.5),
-                                                                            legend.position = c(1.05,0.3), legend.key.size = unit(1, "cm"))
-#save file 
-pdf("", width = 10, height = 10) 
+####P1e
+#load hallmark spatial autocorrelation for all samples
+df <- read.table("", sep = "\t")
+
+colnames(df)[2:14] <- hallmark_names
+#ridge plot for each hallmark
+
+df.long <- df %>% reshape2::melt(id.vars="sample")
+df.long$variable <- factor(df.long$variable, levels = hallmark_names[rev(c(10,1,7,6,5,3,2,8,9,12,11,13,4))])
+pdf("", height = 10, width = 8.5)
+p <- ggplot(df.long, aes(y=variable, x=value, fill=variable)) + geom_density_ridges() + xlim(c(0,1)) +
+  scale_fill_manual(values = do.call(c, color_codes))+ theme_ridges(center_axis_labels = T) + 
+  geom_vline(xintercept = 0, linetype="dashed", col="gray32") + 
+  theme(legend.position = "none", panel.grid.major.x = element_blank()) + labs(x="Moran's I", y="") 
 plot(p)
 dev.off()
 
 ### P2 
 #image
-hires <- readRDS("../image/Colorectal.rds")
+sample <- "Colorectal1"
+hires <- readRDS("")
 #spot location
-v <- readRDS("../bayes/Colorectal.rds")
+v <- readRDS("")
 v <- v[v$spot != "subspot_1.1",]
 #sub-spot data
-sub_data <- read.table("../output_df/Colorectal.txt")
+sub_data <- read.table("")
 cluster <- c("5" = "lightgoldenrod1", "4" = "lightgoldenrod3", "3" = "lightpink2", "2"= "orchid3", "1"= "orchid4")
 
 #### P2a2
@@ -322,8 +279,9 @@ hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~
                                        legend.text = element_text(size = 20))
 dev.off()
 
-#### P2a4
-df <- readxl::read_xlsx("Downloads/Rstudiotumor(1).xlsx")
+#### P2b
+#supplementary table S7
+df <- readxl::read_xlsx("")
 df$Others[20] <- "100"
 colnames(df)[1] <- "clusters"
 df_filtered <- df %>% filter(!is.na(`Tumor %`)) %>% select(clusters,`Tumor %`, `Stroma %`, `Necrosis %`)
@@ -354,194 +312,173 @@ pdf("", width = 12, height = 8)
 p1/p2 
 dev.off()
 
-#### P2b
-# (PanCancerHeatmap.R)
+#### P2c
+# run (PanCancerHeatmap.R)
+
+#### P2d1
+spot_info <- read.table("")
+sample <- "Colorectal1"
+print(sample)
+hallmark <- "H13" #unlocking phenotypic plasticity
+sce <- readRDS("")
+sce <- sce[,-1]
+colData(sce)[, hallmark] <- spot_info[spot_info$sample==sample, hallmark]
+
+v <- .make_triangle_subspots(colData(sce), fill = hallmark)
+
+ref_v <- readRDS("")
+hires <- readRDS("")
+
+for (spot in unique(v$spot)) {
+  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+pdf()
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_gradientn(hallmark, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000])
+dev.off()
+## violin
+Colorectal1 <- spot_info %>% filter(sample == "Colorectal1") %>% 
+  mutate(compartment = case_when(cluster %in% 1:2 ~ "Neoplastic",
+                               cluster %in% 4:5 ~ "TME",
+                               TRUE ~ "Buffer")) %>% 
+  filter(compartment != "Buffer")
+
+colors <- c("TME" = "lightgoldenrod1", "Neoplastic"= "orchid4")
+
+ggplot(Colorectal1, aes(x = compartment, y = H13, color = compartment)) +
+  geom_sina(size = 0.01, maxwidth = 0.8) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, aes(color= NA)) +
+  scale_color_manual(values = colors) +
+  theme_classic() + ylab("Unlocking Phenotypic Plasticity")  +
+  theme(axis.text=element_text(size=16, family = "Arial"),
+        axis.title=element_text(size=18,face="bold")
+  ) +
+  stat_compare_means(family = "Arial", size = 5, label.y = 4) +
+  geom_hline(yintercept=0, linetype= "dashed",
+             color = "black", size=0.5)
+
+#### P2d2
+hallmark <- "H4" #enablign replicative immortality
+sce <- readRDS("")
+sce <- sce[,-1]
+colData(sce)[, hallmark] <- spot_info[spot_info$sample==sample, hallmark]
+
+v <- .make_triangle_subspots(colData(sce), fill = hallmark)
+
+ref_v <- readRDS("")
+hires <- readRDS("")
+
+for (spot in unique(v$spot)) {
+  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+pdf()
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_gradientn(hallmark, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000])
+dev.off()
+
+## violin
+ggplot(Colorectal1, aes(x = compartment, y = H4, color = compartment)) +
+  geom_sina(size = 0.01, maxwidth = 0.8) +
+  geom_boxplot(outlier.shape = NA, alpha = 0.6, aes(color= NA)) +
+  scale_color_manual(values = colors) +
+  theme_classic() + ylab("Enabling Replicative Immortality")  +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=18,face="bold")
+  ) +
+  stat_compare_means(family = "Arial", size = 5, label.y = 4)+
+  geom_hline(yintercept=0, linetype= "dashed",
+             color = "black", size=0.5)
+
+
+#### P2e
+samples <- df$sample
+df_all_samples <- c()
+for (sample_id in samples) {
+  df_whole <- df %>% filter(sample==sample_id) %>% remove_rownames %>% column_to_rownames(var="sample") %>% t()  %>% as.data.frame() 
+  colnames(df_whole) <- c("cor")
+  df_whole$tissue <- "Whole"
+  df_whole$signature <- rownames(df_whole)
+  
+  
+  #Neoplastic 
+  df_neoplastic <- read.table(paste0("Desktop/IJC/datasets/IGTP/figuresPaper/moran/Neoplastic/", sample_id,"_HallmarkMoran.txt"), sep = "\t")
+  df_neoplastic <- df_neoplastic %>% filter(!hallmark %in% paste0("H", c(1,3,5,6,7,9,13)))
+  
+  df_neoplastic <- df_neoplastic %>% select(-hallmark)
+  df_neoplastic$tissue <- "Neoplastic"
+  df_neoplastic$signature <- rownames(df_neoplastic)
+  
+  #TME 
+  
+  df_TME <- read.table(paste0("Desktop/IJC/datasets/IGTP/figuresPaper/moran/TME/", sample_id,"_HallmarkMoran.txt"), sep = "\t")
+  df_TME <- df_TME %>% filter(hallmark %in% paste0("H", c(1,3,5,6,7,9,13)))
+  
+  df_TME <- df_TME %>% select(-hallmark)
+  df_TME$tissue <- "TME"
+  df_TME$signature <- rownames(df_TME)
+  
+  df_all <- rbind(df_whole, df_neoplastic, df_TME)
+  df_all$id <- paste0(df_all$tissue, "_", df_all$signature2)
+  df_all_samples <- rbind(df_all_samples, df_all)
+}
+#boxplot 
+df_all_samples$tissue <- factor(df_all_samples$tissue, levels = c("Whole","Neoplastic", "TME"))
+ggplot(df_all_samples, aes(x=tissue,y=cor, fill=tissue))  + 
+  geom_violin() + geom_boxplot(width=0.1, outlier.size = 0.4, alpha=0.2, ) + ylim(c(0,1.05)) + 
+  stat_compare_means(size=6, family="Times New Roman") + theme_classic() +
+  labs(y="Moran's I", x="Tissue") + 
+  ggtitle("Spatial autocorrelation of Hallmark activities") +
+  scale_fill_manual(values = c("gray","orchid4", "lightgoldenrod1")) + 
+  theme(axis.text = element_text(size=18), #axis.text.x = element_text( angle = -45, hjust = 0),
+        axis.title = element_text(size=14, face="bold"),
+        legend.position = "none", plot.title = element_text(size=18,hjust=0.5,face="bold"))
+ggsave("", width = 7, height = 5)
 
 ### P3
-#### P3b1
-d <- data.frame(estimate=sub_data$estimate, score=sub_data$score)
-model <- lm(estimate~score, data = d)
-sub_data$residuals <- model$residuals
-#save file 
-pdf("", width = 10, height = 7) 
-ggplot(sub_data, aes(x=score, y=estimate, col=residuals)) + geom_point() + geom_smooth(method = "lm", color="black") +
-  scale_color_gradient2(low = "navy", mid = "gainsboro", high = "firebrick3") + theme_classic() + labs(x="NEIGHBORHOOD score", y="ESTIMATE score", col="Residuals") + 
-  scale_x_continuous(labels = c("Cancer", "TME"), breaks = c(-50, 100)) + 
-  scale_y_continuous(labels = c("Cancer", "TME"), breaks = c(-5000, 10000)) + 
-  theme(axis.ticks = element_blank(), axis.text = element_text(size = 20), axis.title = element_text(size = 25), legend.position = "none") 
-dev.off()
 
-#### P3b2
-v$fill <- sub_data[v$spot,"residuals"]
-#save file 
-pdf("", width = 10, height = 10) 
-hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
-  scale_fill_gradient2(low = "navy", mid = "gainsboro", high = "firebrick3") + labs(fill="") + ggtitle("Residuals") + 
-  theme(plot.title = element_text(size = 35, hjust = 0.5), legend.key.height = unit(115, "points"), 
-        legend.key.width = unit(25, "points"), legend.text = element_text(size=20))
-dev.off()
-
-#### P3c
-#### P3d
-#### P3e
-### P5
-#### P5a
-# (CancerCircos.R)
-
-#### P5b
-# (CancerCircos.R)
-
-#### P5l: Cluster plots for SCD legend
-sample <- "M1"
-#single cell experiment enhanced object without imputed genes
-sce <- readRDS("")
-sce <- sce[,-1]
-sce$clusters <- spot_info[spot_info$sample==sample, "clusters"]
-sce$compartments <- cut(sce$clusters, breaks = c(0,2.5,3.5,5), labels = c("Cancer", "Buffer", "TME"))
-v <- .make_triangle_subspots(colData(sce), fill = "compartments")
-#spot location
-ref_v <- readRDS("")
-#image
-hires <- readRDS("")
-for (spot in unique(v$spot)) {
-  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
-#save file 
-pdf("", width = 7, height = 7) 
-hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~as.factor(fill))) +  theme_void() +
-  labs(fill="Compartments") +  scale_fill_manual(values = rev(c("lightgoldenrod1",  "lightpink2",  "orchid3")))  + theme(legend.position = "bottom")
-dev.off()
-
-sample <- "DU13"
-#single cell experiment enhanced object without imputed genes
-sce <- readRDS("")
-sce <- sce[,-1]
-sce$clusters <- spot_info[spot_info$sample==sample, "clusters"]
-sce$compartments <- cut(sce$clusters, breaks = c(0,2.5,3.5,5), labels = c("Cancer", "Buffer", "TME"))
-v <- .make_triangle_subspots(colData(sce), fill = "compartments")
-#spot location
-ref_v <- readRDS("")
-#image
-hires <- readRDS("")
-for (spot in unique(v$spot)) {
-  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
-#save file 
-pdf("", width = 7, height = 7) 
-hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~as.factor(fill))) +  theme_void() +
-  labs(fill="Compartments") +  scale_fill_manual(values = rev(c("lightgoldenrod1",  "lightpink2",  "orchid3")))  + theme(legend.position = "bottom")
-dev.off()
-
-
-### P6
-#### P6a
-# (TMECircos.R)
-#### P6b
-# (TMECircos.R)
-#### P6c2: M3 clusters
-
-#### P6c3
-#load sub-spot data of all samples
-spot_info <- read.table("")
-sample <- "M3"
-print(sample)
-h_cancer <- "H11"
-h_tme <- "H3"
-#single cell experiment enhanced object without imputed genes
-sce <- readRDS("")
-sce <- sce[,-1]
-colData(sce)[, c(h_cancer, h_tme, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, h_tme, "clusters")]
-
-v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2),], fill = h_cancer)
-v2 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(4,5),], fill = h_tme)
-v3 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(3),], fill = "clusters")
-
-#spot location
-ref_v <- readRDS("")
-#image
-hires <- readRDS("")
-for (spot in unique(v$spot)) {
-  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
-
-
-for (spot in unique(v2$spot)) {
-  v2$imagecol[v2$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v2$imagerow[v2$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
-
-for (spot in unique(v3$spot)) {
-  v3$imagecol[v3$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v3$imagerow[v3$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
-#save file 
-pdf("", width = 7, height = 7) 
-hires + geom_polygon(data=v,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-  scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) + 
-  ggnewscale::new_scale("fill") + geom_polygon(data=v2,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-  scale_fill_gradientn(h_tme, colours = viridisLite::mako(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) + 
-  ggnewscale::new_scale("fill") + geom_polygon(data=v3,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~as.factor(fill))) +
-  scale_fill_manual("Buffer", values = "gray41") 
-dev.off()
-#### P6c4 
-#load sub-spot data of all samples
-spot_info <- read.table("Desktop/df_cnv.txt")
-sample <- "M3"
-print(sample)
-h_cancer <- "H11"
-h_tme <- "H3"
-#single cell experiment enhanced object without imputed genes
-sce <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/RDS_final/M3_sce_enhanced.rds")
-sce <- sce[,-1]
-colData(sce)[, c(h_cancer, h_tme, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, h_tme, "clusters")]
-
-v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2, 3),], fill = h_cancer)
-v2 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(4,5),], fill = h_tme)
-
-#spot location
-ref_v <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/bayes/M3.rds")
-#image
-hires <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/image/M3.rds")
-for (spot in unique(v$spot)) {
-  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
-
-
-
-#save file 
-pdf("Desktop/IJC/datasets/IGTP/figuresPaper/Final/M3.pdf", width = 7, height = 7) 
-hires + geom_polygon(data=v,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-  scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) + 
-  ggnewscale::new_scale("fill") + geom_polygon(data=v2,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-  scale_fill_gradientn(h_tme, colours = viridisLite::mako(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) 
-dev.off()
-### P7
-#### P7a 
-#load df_diff (CNV_experiment.R)
+#### P3a 
+# load df_diff from CNVexperiment.R
 col_fun = colorRamp2(c(0, max(df_diff)), c("white", "red"))
 tissue_annot <- sapply(rownames(df_diff), function(x) {annotation_tissue[[x]]})
+clonal_annot <- sapply(1:nrow(df_diff), function(x){ifelse(sum(df_diff[x, ]) == 0, "Monoclonal", "Polyclonal")})
 col_tissue_map <- setNames(Seurat::DiscretePalette(15, palette = "polychrome") [c(1:3, 5, 6:11)], sort(unique(tissue_annot)))
 
-row_ha = HeatmapAnnotation(`Tumor type` = tissue_annot,
-                           col=list(`Tumor type` = col_tissue_map))
+d <- dist(df_diff[rowSums(df_diff) > 0,])
+clus <- hclust(d, method = "complete")
+plot(clus)
+cutree(clus, 3)
+diff <- c(cutree(clus, 3), setNames(rep(0,12),rownames(df_diff[rowSums(df_diff) == 0,])))
+diff[diff==1] <- "Medium"
+diff[diff==0] <- "Monoclonal"
+diff[diff==2] <- "Low"
+diff[diff==3] <- "High"
+col_diff_map <- setNames(RColorBrewer::brewer.pal(12, "Paired")[c(1,3,5,7)], unique(diff))
+row_ha = HeatmapAnnotation(`Hallmark activity difference` = factor(diff[rownames(df_diff)]),
+                           `Tumor type` = tissue_annot,
+                           col=list(`Tumor type` = col_tissue_map,
+                                    `Hallmark activity difference` = col_diff_map), 
+                           annotation_height = list(`Tumor type` = unit(2, "cm"),
+                                                    `Clonality` = unit(1, "cm")))
 palette <- do.call(c,color_codes[c(2,4,8,10,11,12)])
 names(palette) <- NULL
 top_ha = rowAnnotation(" " = anno_boxplot(df_diff, height = unit(2, "cm"),gp = gpar(fill = palette)))
-#save file 
-pdf("", width = 14, height = 3) 
+
+
+
+pdf("", width = 16.5, height = 3)
 Heatmap(t(df_diff), name = "Difference", border = "black", col=col_fun, show_row_names =T, 
         show_column_names =F,
-        top_annotation =  row_ha,
+        top_annotation =  row_ha, column_split = factor(clonal_annot, levels = c("Polyclonal", "Monoclonal")), cluster_column_slices=F,
         left_annotation = top_ha, 
         rect_gp = gpar(col = "gray", lwd = 0.1))
 dev.off()
-#### P7b1 
-samples <- c("M3", "Intestine")
-cnv_clusters <- list(M3=1:2, Intestien=0:2, HCC2T=0:2, OV4A=0)
+
+#### P3b 
+cnv <- read.table("")
+samples <- c("Breast7", "Colorectal8","Ovarian1", "Liver3")
+cnv_clusters <- list(M3=0:2, Intestine=0:2, HCC2T=0:2, OV4A=0)
 for (sample in samples) {
   #single cell experiment enhanced object without imputed genes
   sce <- readRDS("")
@@ -559,12 +496,13 @@ for (sample in samples) {
   }
   #save file 
   pdf("", width = 7, height = 7) 
-  hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~as.factor(fill))) +  theme_void() +
+  hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol-500, group=~spot, fill=~as.factor(fill))) +  theme_void() +
     labs(fill="CNV clones") +  scale_fill_manual(values = c("#E69F00", "#0072B2", "#009E73"))
   dev.off()
 }
-#### P7b2
-samples <- c("M3", "OV4A", "HCC2T","Intestine")
+
+#### P3c
+samples <- c("Breast7", "Colorectal8","Ovarian1", "Liver3")
 for (sample_id in samples) {
   df <- spot_info[spot_info$sample == sample_id &  spot_info$cnv  %in%  perc_filter$cnv_cluster[perc_filter$sample == sample_id] & spot_info$clusters %in% 1:2, ] %>% 
     select(H2,H4,H8,H10,H11,H12, cnv_cluster) %>% melt(id.vars = "cnv_cluster")
@@ -596,113 +534,336 @@ for (sample_id in samples) {
   dev.off()
   
 }
-#### P7c 
-#load paths from PathScore (CNV_experiment.R)
-paths <- read.table("Downloads/M3.txt", sep = "\t", check.names = F)
-paths[, 15:ncol(paths)] <- scale(paths[, 15:ncol(paths)])
-#load sub-spot data of all samples (same as spot_info)
-cnv <- read.table("")
-cnv <- cnv %>% filter(sample == "M3")
-paths[cnv$spotid, "cnv_cluster"] <- cnv$cnv_cluster
 
+### P4
+#### P4b2
+#sample Kidney5
+hires <- readRDS("")
+#spot location
+v <- readRDS("")
+v <- v[v$spot != "subspot_1.1",]
+#sub-spot data
+sub_data <- read.table("")
+cluster <- c("5" = "lightgoldenrod1", "4" = "lightgoldenrod3", "3" = "lightpink2", "2"= "orchid3", "1"= "orchid4")
 
-pathways <- c("H10_Glycolysis", "H11_Senescence-Associated Secretory Phenotype (SASP)",
-              "H2_p53 pathway", "H4_Packaging Of Telomere Ends", "H8_G2/M DNA damage checkpoint", "H12_HATs acetylate histones")
-
-
-sample <- "M3"
-#single cell experiment enhanced object without imputed genes
+v$fill <- sub_data[v$spot,"estimate"]
+#save file 
+pdf("", width = 10, height = 10) 
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
+  scale_fill_gradientn(colours = rev(cluster), breaks=c(min(v$fill), max(v$fill)),labels=c("Cancer pure","TME pure")) + labs(fill="") + 
+  theme(legend.direction = "horizontal", legend.position = "bottom", legend.key.width = unit(118, "point"),
+        legend.text = element_text(size = 20), plot.title = element_text(size = 45, hjust = 0.5)) +
+  ggtitle("ESTIMATE score")
+dev.off()
+#### P4b3
+spot_info <- read.table("")
+sample <- "Kidney5"
+h_tme <- "H3" #Avoiding Immune Destruction
 sce <- readRDS("")
 sce <- sce[,-1]
-pathway <- pathways[2]
-colData(sce)[, c(pathways, "clusters", "cnv_cluster")] <- paths[, c(pathways, "estimate.cluster", "cnv_cluster")]
-sce$empty <- "empty"
-#spot location
+colData(sce)[, c(h_tme, "clusters")] <- spot_info[spot_info$sample==sample, c(h_tme, "clusters")]
+
+v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2,3),], fill = "clusters")
+v$fill <- "NA"
+v2 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(4,5),], fill = h_tme)
+
 ref_v <- readRDS("")
-#image
 hires <- readRDS("")
-v3 <- .make_triangle_subspots(colData(sce)[!(sce$clusters %in% c(1,2) & sce$cnv_cluster %in% 0:2),], fill = "empty")
-for (spot in unique(v3$spot)) {
-  v3$imagecol[v3$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v3$imagerow[v3$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+
+for (spot in unique(v$spot)) {
+  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+for (spot in unique(v2$spot)) {
+  v2$imagecol[v2$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v2$imagerow[v2$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
 }
 
-for (pathway in pathways) {
-  pathway <- pathways[2]
-  print(pathway)
-  v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2) & sce$cnv_cluster %in% 0:2,], fill = pathway)
-  for (spot in unique(v$spot)) {
-    v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-    v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+pdf("", width = 7, height = 7)
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
+  scale_fill_manual("Buffer", values = "gray41")  + 
+  ggnewscale::new_scale("fill") + geom_polygon(data=v2,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_viridis_c()
+dev.off()
+
+#### P4b4
+h_tme <- "H3_cancer" #Avoiding Immune Destruction (RADAR scores)
+sce <- readRDS("")
+sce <- sce[,-1]
+#(TMERadar.R)
+cancer_radar <- read.table("") 
+colData(sce)[, c("clusters")] <- spot_info[spot_info$sample==sample, c("clusters")]
+sce$H3_cancer <- NA
+colData(sce)[sce$clusters %in% 1:2, h_tme] <- cancer_radar[cancer_radar$sample==sample, h_tme]
+
+v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2),], fill = h_tme)
+v2 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(3,4,5),], fill = "clusters")
+v2$fill <- "NA"
+
+ref_v <- readRDS("")
+hires <- readRDS("")
+
+for (spot in unique(v$spot)) {
+  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+for (spot in unique(v2$spot)) {
+  v2$imagecol[v2$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v2$imagerow[v2$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+
+pdf("", width = 7, height = 7)
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal() +
+  scale_fill_viridis_c()  + 
+  ggnewscale::new_scale("fill") + geom_polygon(data=v2,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_manual("Buffer", values = "gray41")
+dev.off()
+
+#### P4b5
+spot_info <- read.table("")
+sample <- "Kidney5"
+h_cancer <- "H2" #Evading Growth Suppressors
+h_tme <- "H3" #Avoiding Immune Destruction
+sce <- readRDS("")
+sce <- sce[,-1]
+colData(sce)[, c(h_cancer, h_tme, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, h_tme, "clusters")]
+
+v <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(1,2,3),], fill = h_cancer)
+v2 <- .make_triangle_subspots(colData(sce)[sce$clusters %in% c(4,5),], fill = h_tme)
+
+ref_v <- readRDS("")
+hires <- readRDS("")
+
+for (spot in unique(v$spot)) {
+  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+
+for (spot in unique(v2$spot)) {
+  v2$imagecol[v2$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
+  v2$imagerow[v2$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
+}
+
+pdf("", width = 7, height = 7)
+hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) + 
+  ggnewscale::new_scale("fill") + geom_polygon(data=v2,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
+  scale_fill_gradientn(h_tme, colours = viridisLite::mako(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) 
+dev.off()
+
+### P5
+#### P5a1
+# load RF_results_Cancer from (CancerCircos.R)
+# extract target, predictor and spatial direction and create long format df
+direction_df <- melt(RF_results_Cancer[,c(14:20,13)], id.vars = "response")
+colnames(direction_df)[3] <- "dir"
+imp_df <- melt(RF_results_Cancer[,c(2:8,13)], id.vars = "response")
+imp_df <- cbind(imp_df, direction_df[,3])
+colnames(imp_df)[4] <- "dir"
+imp_df$dir <- as.numeric(imp_df$dir)
+imp_df$variable <- factor(imp_df$variable, levels = c("H3", "H1", "H9", "H6", "H7", "H13", "H5"))
+imp_df <- arrange(imp_df, variable)
+
+## combined with geom_sina
+ggplot(imp_df, aes(x = variable, y = value, color = dir)) +
+  geom_sina(size = 2, maxwidth = 0.8) +
+  scale_color_gradient2(
+    low = muted("blue"),
+    mid = "white",
+    high = muted("darkgreen"),
+    midpoint = 0,
+    space = "Lab",
+    na.value = "grey50",
+    guide = "colourbar"
+  ) + geom_boxplot(outlier.shape = NA, alpha = 0.6) +
+  theme_classic() + ylab("Feature Importance Fraction")  +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=18,face="bold")
+  ) +
+  stat_compare_means(ref.group = c("H3"), size = 4.5, label = "p.format",family = "Arial", label.y = 0.9) +
+  stat_compare_means(family = "Arial", size = 5, label.y = 1)
+
+#### P5a2
+# load RF_results_TME from (TMECircos.R)
+# extract target, predictor and spatial direction and create long format df
+direction_df <- melt(RF_results_TME[,c(13:18,12)], id.vars = "response")
+colnames(direction_df)[3] <- "dir"
+imp_df <- melt(RF_results_TME[,c(2:7,12)], id.vars = "response")
+imp_df <- cbind(imp_df, direction_df[,3])
+colnames(imp_df)[4] <- "dir"
+imp_df$dir <- as.numeric(imp_df$dir)
+imp_df$variable <- factor(imp_df$variable, levels = c("H10", "H11", "H2", "H4", "H12", "H8"))
+imp_df <- arrange(imp_df, variable)
+
+## combined with geom_sina
+ggplot(imp_df, aes(x = variable, y = value, color = dir)) +
+  geom_sina(size = 2, maxwidth = 0.8) +
+  scale_color_gradient2(
+    low = muted("blue"),
+    mid = "white",
+    high = muted("darkgreen"),
+    midpoint = 0,
+    space = "Lab",
+    na.value = "grey50",
+    guide = "colourbar"
+  ) + geom_boxplot(outlier.shape = NA, alpha = 0.6) +
+  theme_classic() + ylab("Feature Importance Fraction")  +
+  theme(axis.text=element_text(size=16),
+        axis.title=element_text(size=18,face="bold")
+  ) +
+  stat_compare_means(ref.group = c("H10"), size = 5, label = "p.format",family = "Arial", label.y = 0.9)+
+  stat_compare_means(family = "Arial", size = 5, label.y = 1)
+
+#### P5b1
+RF_results_Cancer <- data.frame(RF_results_Cancer, row.names = 1)
+RF_Cancer_Imp <- data.frame(t(RF_results_Cancer[1:7]))
+RF_Cancer_dir <- data.frame(t(RF_results_Cancer[13:19]))
+RF_Cancer_dir <- RF_Cancer_dir[match(paste0(rownames(RF_Cancer_Imp), "_cor"), rownames(RF_Cancer_dir)), ]
+# sort each column and count how many hallmarks reach 0.75
+RI_hallmarks_Cancer <- data.frame(matrix(nrow = 2436, ncol = 2)) # 348 * 7
+colnames(RI_hallmarks_Cancer)[1:2] <- c("n_Hallmarks", "RI")
+RI_hallmarks_Cancer$n_Hallmarks <- c(rep(1,348), rep(2,348), rep(3,348), rep(4,348), rep(5,348), rep(6,348), rep(7,348))
+RI_hallmarks_Cancer$n_models <- c(rep(1:348,7))
+RI_hallmarks_Cancer$sample <- ""
+RI_hallmarks_Cancer$response <- ""
+RI_hallmarks_Cancer$predictor <- ""
+RI_hallmarks_Cancer$dir <- ""
+for(h in 1:7){
+  for (c in 1:ncol(RF_Cancer_Imp)){
+    RF_Cancer_Imp <- arrange(RF_Cancer_Imp, desc(RF_Cancer_Imp[,c]))
+    RF_Cancer_dir <- RF_Cancer_dir[match(paste0(rownames(RF_Cancer_Imp), "_cor"), rownames(RF_Cancer_dir)), ]
+    RI_hallmarks_Cancer[RI_hallmarks_Cancer$n_models== c & RI_hallmarks_Cancer$n_Hallmarks == h,]$RI <- RF_Cancer_Imp[h,c]
+    RI_hallmarks_Cancer[RI_hallmarks_Cancer$n_models== c & RI_hallmarks_Cancer$n_Hallmarks == h,]$dir <- RF_Cancer_dir[h,c]
+    if (length(strsplit(names(RF_Cancer_Imp[c]), split = "_")[[1]]) < 3){
+      RI_hallmarks_Cancer[RI_hallmarks_Cancer$n_models== c & RI_hallmarks_Cancer$n_Hallmarks == h,]$response <- strsplit(names(RF_Cancer_Imp[c]), "_")[[1]][2]
+      RI_hallmarks_Cancer[RI_hallmarks_Cancer$n_models== c & RI_hallmarks_Cancer$n_Hallmarks == h,]$sample <- strsplit(names(RF_Cancer_Imp[c]), "_")[[1]][1]
+    }
+    else {
+      RI_hallmarks_Cancer[RI_hallmarks_Cancer$n_models== c & RI_hallmarks_Cancer$n_Hallmarks == h,]$response <- strsplit(names(RF_Cancer_Imp[c]), "_")[[1]][3]
+      RI_hallmarks_Cancer[RI_hallmarks_Cancer$n_models== c & RI_hallmarks_Cancer$n_Hallmarks == h,]$sample <- paste0(strsplit(names(RF_Cancer_Imp[c]), split = "_")[[1]][1],"_",strsplit(names(RF_Cancer_Imp[c]), split = "_")[[1]][2])
+    }
+    RI_hallmarks_Cancer[RI_hallmarks_Cancer$n_models== c & RI_hallmarks_Cancer$n_Hallmarks == h,]$predictor <- rownames(RF_Cancer_Imp[h,])
   }
-  #save file 
-  pdf("", width = 7, height = 7) 
-  hires + geom_polygon(data=v,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-    scale_fill_gradientn("Pathway activity", colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000]) + 
-    ggnewscale::new_scale("fill") + geom_polygon(data=v3,  aes_(x=~imagerow+20, y=~imagecol+100, group=~spot, fill=~as.factor(fill))) +
-    scale_fill_manual("Buffer", values = "gray41") + theme(plot.title = element_text(hjust = 0.5, size=35),
-                                                           legend.position = "none") +  ggtitle("Senescence-Associated\n Secretory Phenotype (SASP)")
-  ggtitle(str_split(pathway, pattern = "_", simplify = T)[1,2])
-  dev.off()
+}
+type <- RF_results_Cancer[c("sample", "type")]
+type <- type[duplicated(type) == F,]
+RI_hallmarks_Cancer$type <- ""
+for (s in type$sample) {
+  RI_hallmarks_Cancer[RI_hallmarks_Cancer$sample == s,]$type <- type[type$sample == s,]$type
+}
+RI_hallmarks_Cancer$dir <- as.numeric(RI_hallmarks_Cancer$dir)
+RI_hallmarks_Cancer$dir_cat <- ""
+for (r in 1:nrow(RI_hallmarks_Cancer)) {
+  if (RI_hallmarks_Cancer[r,]$dir >= 0.6){
+    RI_hallmarks_Cancer[r,]$dir_cat <- "Positive"
+  }
+  else if (RI_hallmarks_Cancer[r,]$dir <= -0.6){
+    RI_hallmarks_Cancer[r,]$dir_cat <- "Negative"
+  } else {RI_hallmarks_Cancer[r,]$dir_cat <- "nonlinear"}
+}
+## fraction for rank 1
+color_codes <-  c("H1"= "#15CE59",
+                  "H2" = "#701717",
+                  "H3" = "#CB3BBD",
+                  "H4" = "#4969D4",
+                  "H5" = "#E6880D",
+                  "H6" = "#000000",
+                  "H7" = "#EE0F16",
+                  "H8" = "#132892",
+                  "H9" = "#8E909B",
+                  "H10" = "#71189E",
+                  "H11" = "#05F3EB",
+                  "H12" = "#890269",
+                  "H13" = "#95641A")
+RI_hallmarks_Cancer_fr <- RI_hallmarks_Cancer
+
+RI_hallmarks_Cancer_fr <- filter(RI_hallmarks_Cancer, n_Hallmarks == 1)
+# barplot
+RI_hallmarks_Cancer_fr$dir_cat <- factor(RI_hallmarks_Cancer_fr$dir_cat, levels = c("Positive", "Negative", "nonlinear"))
+RI_hallmarks_Cancer_fr <- arrange(RI_hallmarks_Cancer_fr, dir_cat)
+RI_hallmarks_Cancer_fr$predictor <- factor(RI_hallmarks_Cancer_fr$predictor, levels = c("H3", "H1", "H9", "H6", "H7", "H13", "H5"))
+
+
+ggplot (RI_hallmarks_Cancer_fr,aes (x = response, fill = predictor, y = RI)) + geom_bar(stat = "identity", position = "stack") + 
+  facet_wrap (~dir_cat) + scale_fill_manual(values = color_codes[c("H3", "H1", "H9", "H6", "H7", "H13", "H5")]) +
+  theme_classic()
+#### P5b2
+RF_results_TME <- data.frame(RF_results_TME, row.names = 1)
+
+RF_TME_Imp <- data.frame(t(RF_results_TME[1:6]))
+View(RF_TME_Imp)
+
+RF_TME_dir <- data.frame(t(RF_results_TME[12:17]))
+RF_TME_dir <- RF_TME_dir[match(paste0(rownames(RF_TME_Imp), "_cor"), rownames(RF_TME_dir)), ]
+View(RF_TME_dir)
+
+#
+RI_hallmarks_TME <- data.frame(matrix(nrow = 2436, ncol = 2))
+colnames(RI_hallmarks_TME)[1:2] <- c("n_Hallmarks", "RI")
+RI_hallmarks_TME$n_Hallmarks <- c(rep(1,406), rep(2,406), rep(3,406), rep(4,406), rep(5,406), rep(6,406))
+RI_hallmarks_TME$n_models <- c(rep(1:406,6))
+RI_hallmarks_TME$sample <- ""
+RI_hallmarks_TME$response <- ""
+RI_hallmarks_TME$predictor <- ""
+RI_hallmarks_TME$dir <- ""
+
+for(h in 1:6){
+  for (c in 1:ncol(RF_TME_Imp)){
+    RF_TME_Imp <- arrange(RF_TME_Imp, desc(RF_TME_Imp[,c]))
+    RF_TME_dir <- RF_TME_dir[match(paste0(rownames(RF_TME_Imp), "_cor"), rownames(RF_TME_dir)), ]
+    RI_hallmarks_TME[RI_hallmarks_TME$n_models== c & RI_hallmarks_TME$n_Hallmarks == h,]$RI <- RF_TME_Imp[h,c]
+    RI_hallmarks_TME[RI_hallmarks_TME$n_models== c & RI_hallmarks_TME$n_Hallmarks == h,]$dir <- RF_TME_dir[h,c]
+    
+    if (length(strsplit(names(RF_TME_Imp[c]), split = "_")[[1]]) < 3){
+      RI_hallmarks_TME[RI_hallmarks_TME$n_models== c & RI_hallmarks_TME$n_Hallmarks == h,]$response <- strsplit(names(RF_TME_Imp[c]), "_")[[1]][2]
+      RI_hallmarks_TME[RI_hallmarks_TME$n_models== c & RI_hallmarks_TME$n_Hallmarks == h,]$sample <- strsplit(names(RF_TME_Imp[c]), "_")[[1]][1]
+    }
+    else {
+      RI_hallmarks_TME[RI_hallmarks_TME$n_models== c & RI_hallmarks_TME$n_Hallmarks == h,]$response <- strsplit(names(RF_TME_Imp[c]), "_")[[1]][3]
+      RI_hallmarks_TME[RI_hallmarks_TME$n_models== c & RI_hallmarks_TME$n_Hallmarks == h,]$sample <- paste0(strsplit(names(RF_TME_Imp[c]), split = "_")[[1]][1],"_",strsplit(names(RF_TME_Imp[c]), split = "_")[[1]][2])
+    }
+    RI_hallmarks_TME[RI_hallmarks_TME$n_models== c & RI_hallmarks_TME$n_Hallmarks == h,]$predictor <- rownames(RF_TME_Imp[h,])
+  }
+}
+
+type <- RF_results_TME[c("sample", "type")]
+type <- type[duplicated(type) == F,]
+
+RI_hallmarks_TME$type <- ""
+for (s in type$sample) {
+  RI_hallmarks_TME[RI_hallmarks_TME$sample == s,]$type <- type[type$sample == s,]$type
+}
+
+RI_hallmarks_TME$dir <- as.numeric(RI_hallmarks_TME$dir)
+RI_hallmarks_TME$dir_cat <- ""
+for (r in 1:nrow(RI_hallmarks_TME)) {
+  if (RI_hallmarks_TME[r,]$dir >= 0.6){
+    RI_hallmarks_TME[r,]$dir_cat <- "Positive"
+  }
+  else if (RI_hallmarks_TME[r,]$dir <= -0.6){
+    RI_hallmarks_TME[r,]$dir_cat <- "Negative"
+  } else {RI_hallmarks_TME[r,]$dir_cat <- "nonlinear"}
+  
 }
 
 
+RI_hallmarks_TME_fr <- RI_hallmarks_TME
+
+RI_hallmarks_TME_fr <- filter(RI_hallmarks_TME, n_Hallmarks == 1)
+# barplot
+RI_hallmarks_TME_fr$dir_cat <- factor(RI_hallmarks_TME_fr$dir_cat, levels = c("Positive", "Negative", "nonlinear"))
+RI_hallmarks_TME_fr <- arrange(RI_hallmarks_TME_fr, dir_cat)
+RI_hallmarks_TME_fr$predictor <- factor(RI_hallmarks_TME_fr$predictor, levels = c("H10", "H11", "H2", "H4", "H12", "H8"))
 
 
-###########
+ggplot (RI_hallmarks_TME_fr,aes (x = response, fill = predictor, y = RI)) + geom_bar(stat = "identity", position = "stack") + 
+  facet_wrap (~dir_cat) + scale_fill_manual(values = color_codes[c("H10", "H11", "H2", "H4", "H12", "H8")]) +
+  theme_classic()
 
-#load sub-spot data of all samples
-spot_info <- read.table("Desktop/df_cnv.txt")
-sample <- "Co1"
-h_cancer <- "H4"
-#single cell experiment enhanced object without imputed genes
-sce <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/RDS_final/Co1_sce_enhanced.rds")
-sce <- sce[,-1]
-colData(sce)[, c(h_cancer, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, "clusters")]
-
-v <- .make_triangle_subspots(colData(sce), fill = h_cancer)
-
-#spot location
-ref_v <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/bayes/Co1.rds")
-#image
-hires <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/image/Co1.rds")
-for (spot in unique(v$spot)) {
-  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
+#### P5c1
+# (CancerCircos.R)
+#### P5c2
+# (TMECircos.R)
 
 
-#save file 
-pdf("Desktop/IJC/datasets/IGTP/figuresPaper/Final/Fig2_H4.pdf", width = 7, height = 7) 
-hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-  scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000])
-dev.off()
 
-spot_info <- read.table("Desktop/df_cnv.txt")
-sample <- "Co1"
-h_cancer <- "H13"
-#single cell experiment enhanced object without imputed genes
-sce <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/RDS_final/Co1_sce_enhanced.rds")
-sce <- sce[,-1]
-colData(sce)[, c(h_cancer, "clusters")] <- spot_info[spot_info$sample==sample, c(h_cancer, "clusters")]
-
-v <- .make_triangle_subspots(colData(sce), fill = h_cancer)
-
-#spot location
-ref_v <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/bayes/Co1.rds")
-#image
-hires <- readRDS("Desktop/IJC/datasets/IGTP/figuresPaper/hiresplot/image/Co1.rds")
-for (spot in unique(v$spot)) {
-  v$imagecol[v$spot == spot] <- ref_v$imagecol[ref_v$spot==spot] 
-  v$imagerow[v$spot == spot] <- ref_v$imagerow[ref_v$spot==spot]
-}
-
-
-#save file 
-pdf("Desktop/IJC/datasets/IGTP/figuresPaper/Final/Fig2_H13.pdf", width = 7, height = 7) 
-hires + geom_polygon(data=v,  aes_(x=~imagerow, y=~imagecol, group=~spot, fill=~fill)) +  theme_void() + coord_equal()+
-  scale_fill_gradientn(h_cancer, colours = viridisLite::rocket(1000, alpha = 1, begin = 0, end = 1, direction = 1)[200:1000])
-dev.off()
-
-
-##HALLMARKS 

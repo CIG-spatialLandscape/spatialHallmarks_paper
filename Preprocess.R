@@ -1,8 +1,7 @@
 ##################################################
 ## Project: Cancer Hallmarks
-## Script purpose: Preprocess samples, transform to SingleCellExperiment object and run clustering (example of P8)
-## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Script purpose: Preprocess samples, transform to SingleCellExperiment object and run clustering (example of Lung7)
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 library(STutility)
@@ -14,16 +13,16 @@ library(ggplot2)
 
 
 #create directory to store figures
-if(!file.exists("../P8/figures")) dir.create("../P8/figures") 
+if(!file.exists("../Lung7/figures")) dir.create("../Lung7/figures") 
 #create directory to store RDS files
-if(!file.exists("../P8/RDS")) dir.create("../P8/RDS") 
+if(!file.exists("../Lung7/RDS")) dir.create("../Lung7/RDS") 
 
 
 #path of each file
-infoTable <- data.frame(samples="../P8/filtered_feature_bc_matrix.h5")
-infoTable$spotfiles="../P8/spatial/tissue_positions_list.csv"
-infoTable$imgs="../P8/spatial/tissue_hires_image.png"
-infoTable$json="../P8/spatial/scalefactors_json.json"
+infoTable <- data.frame(samples="../Lung7/filtered_feature_bc_matrix.h5")
+infoTable$spotfiles="../Lung7/spatial/tissue_positions_list.csv"
+infoTable$imgs="../Lung7/spatial/tissue_hires_image.png"
+infoTable$json="../Lung7/spatial/scalefactors_json.json"
 
 #create Seurat object through STutility, keep genes that have at least 5 counts in the whole tissue
 STobject <- InputFromTable(infotable = infoTable, 
@@ -58,27 +57,27 @@ STobject<- SubsetSTData(STobject, labels == "Default")
 
 #Quality Control -> remove spots having a low number of Features
 VlnPlot(STobject, features = c("nFeature_RNA", "nCount_RNA"))
-ggsave("../P8/figures/VlnPlot_prefiltering.pdf")
+ggsave("../Lung7/figures/VlnPlot_prefiltering.pdf")
 STobject<- subset(STobject, nFeature_RNA > 250)
 VlnPlot(STobject, features = c("nFeature_RNA", "nCount_RNA"))
-ggsave("../P8/figures/VlnPlot_postfiltering.pdf")
+ggsave("../Lung7/figures/VlnPlot_postfiltering.pdf")
 
 #Load image in Seurat object to use Seurat plotting functions
-img <- Seurat::Read10X_Image(image.dir = '../P8/spatial/', image.name = "tissue_lowres_image.png")
+img <- Seurat::Read10X_Image(image.dir = '../Lung7/spatial/', image.name = "tissue_lowres_image.png")
 Seurat::DefaultAssay(object = img) <- 'RNA'
 rownames(img@coordinates) <- paste0(rownames(img@coordinates), "_1")
 img <- img[colnames(x = STobject)]
-STobject[['P8']] <- img
+STobject[['Lung7']] <- img
 SpatialFeaturePlot(STobject, features = "nFeature_RNA")
-ggsave("../P8/figures/nFeature.pdf")
+ggsave("../Lung7/figures/nFeature.pdf")
 
 #Normalization of the data returning all genes (SCT)
 STobject <- SCTransform(STobject,return.only.var.genes = FALSE, variable.features.n = NULL, variable.features.rv.th = 1.1, assay = "RNA")
-saveRDS(STobject, "../P8/RDS/P8.rds")
+saveRDS(STobject, "../Lung7/RDS/Lung7.rds")
 
 ########## Create SingleCellExperiment object with SCT normalization ###########
 
-spatial_dir <- "../P8/spatial/"
+spatial_dir <- "../Lung7/spatial/"
 
 colData <- read.csv(file.path(spatial_dir, "tissue_positions_list.csv"), 
                     header = FALSE)
@@ -107,7 +106,7 @@ ST_sce <- spatialPreprocess(ST_sce, platform = "Visium", n.PCs = 15,
 ST_sce <- qTune(ST_sce, qs = seq(2, 20), platform = "Visium",d =15)
 p <- qPlot(ST_sce)
 
-pdf("../P8/figures/BayesQplot.pdf", width = 8, height = 7)
+pdf("../Lung7/figures/BayesQplot.pdf", width = 8, height = 7)
 print(p)
 dev.off()
 
@@ -122,5 +121,5 @@ ST_sce$spatial.cluster <- as.factor(ST_sce$spatial.cluster)
 
 palette <- RColorBrewer::brewer.pal(q, name = "Paired")
 clusterPlot(ST_sce, palette = palette, size=0.05) + labs(title = "Spot-level clustering")
-saveRDS(ST_sce, "../P8/RDS/P8_sce.rds")
+saveRDS(ST_sce, "../Lung7/RDS/Lung7_sce.rds")
 

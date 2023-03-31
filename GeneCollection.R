@@ -1,14 +1,12 @@
 ##################################################
 ## Project: Cancer Hallmarks
-  ## Script purpose: Obtain hallmark signatures using Pathway Commons
-## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Script purpose: Obtain hallmark signatures using Pathway Commons
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 
 library(tidyverse)
 library(stringr)
-library(VennDiagram)
 
 # New PathwayCommons database
 ######

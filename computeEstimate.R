@@ -1,4 +1,8 @@
-
+##################################################
+## Project: Cancer Hallmarks
+## Script purpose: Extract enhanced expression matrix and compute ESTIMATE scores
+## Author: Sergi Cervilla* & Mustafa Sibai*
+##################################################
 
 library(Seurat)
 library(estimate)

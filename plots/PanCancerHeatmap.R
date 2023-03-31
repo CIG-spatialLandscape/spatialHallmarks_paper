@@ -1,8 +1,7 @@
 ##################################################
 ## Project: Cancer Hallmarks
 ## Script purpose: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
-## Date: 22/12/2022
-## Author: Sergi Cervilla & Mustafa Sibai
+## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
 
 library(pheatmap)
@@ -92,27 +91,15 @@ pheatmap(t(H_EST.mt),
 
 
 
-#
-
-
+# Significance test of the obtained clustering of the cancer type based on scaled hallmarks activities
 distance_mat <- ClassDiscovery::distanceMatrix(t(H_EST.mt), metric = "pearson")
 Hierar_cl <- hclust(distance_mat, method = "average")
 
 fit <- cutree(Hierar_cl, k = 2)
 
 t <- table(sapply(spot_info$sample, function(x) {
-  rep(annotation_method[[x]], )
-}), fit)[-4,]
-t
-fisher.test(t, )
-chisq.test(t)
-
-
-t <- table(sapply(spot_info$sample, function(x) {
   rep(annotation_tissue[[x]], )
 }), fit)[-4,]
-t
-fisher.test(t )
 chisq.test(t)
 
 

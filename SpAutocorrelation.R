@@ -1,10 +1,16 @@
+##################################################
+## Project: Cancer Hallmarks
+## Script purpose: Compute Moran's for hallmark activities
+## Author: Sergi Cervilla* & Mustafa Sibai*
+##################################################
+
 library(STutility)
 library(stringr)
 library(dplyr)
 
-path_objects <- "~/projects/Hallmarks/objects_mts/"
+path_objects <- ""
 
-source("Desktop/IJC/git/spatialHallmarks_paper/utils/CoordinatesEnhanced.R") 
+source("../utils/CoordinatesEnhanced.R") 
 args = commandArgs(trailingOnly=TRUE)
 sample <- args[1]
 compartment <- args[2]
@@ -97,7 +103,7 @@ CorSpatialGenes_2 <- function (
   
   
   # Obtain data
-  hallmarks <- read.table(paste0("~/projects/Hallmarks/df_outs/", sample, ".txt"))
+  hallmarks <- read.table("")
   data.use <- hallmarks %>% filter(clusters %in% cluster) %>% select(H1:H13) 
   data.use <- data.use[,features,drop=FALSE] %>% t()
   
@@ -130,4 +136,4 @@ CorSpatialGenes_2 <- function (
 
 #compute Moran's for all hallmarks
 df <- CorSpatialGenes_2(sample, cluster = clusters, features = paste0("H", 1:13), nNeighbours = 10)
-write.table(df, paste0("~/projects/Hallmarks/SpAutocorrelation/Neoplastic/",sample, "_HallmarkMoran.txt"), sep = "\t")
+write.table(df, "", sep = "\t")

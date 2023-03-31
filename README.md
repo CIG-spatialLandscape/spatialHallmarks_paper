@@ -34,7 +34,6 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - **HallmarkScores.R**: Script to create a Seurat object from an enhanced SingleCellExperiment object
 - **mat2GCT.sh**: Tranform expression matrix to GCT format
 - **ComputeESTIMATE.R**: Extract enhanced expression matrix and compute ESTIMATE scores
-- **PanCancerHeatmap.R**: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
 - **SpAutocorrelation**: Compute Moran's for hallmark activities
 - **CNVexperiment.R**: Generate CNV clusters and run CNV experiment
 - **SCD.R**: Compute Spatial Continuity Degree at sub-spot resolution
@@ -42,15 +41,17 @@ doi: https://doi.org/10.1101/2022.06.18.496114
 - **TMERadar.R**: Compute Cancer Radar scores for TME spots
 - **RFCancer.R**: Generate Random Forest model to predict a given Cancer Hallmark in a given sample
 - **RFTME.R**: Generate Random Forest model to predict a given TME Hallmark in a given sample
-- **CancerCircos.R**: Plot results of Random Forest models for Cancer Hallmarks
-- **TMECircos.R**: Plot results of Random Forest models for TME Hallmarks
 - **Utils** 
   - **CoordinatesEnhanced.R**: Function to compute the real distance between sub-spots
   - **SamplesMetadata.R**: Variables with metadata and full names for hallmarks and samples
   - **PlottingMod.R**: Modifications of BayesSpace and Seurat plotting to combine and plot high resolution sub-spot plots
   - **annotLook.txt**: Gene type annotation look up table
   - **header.txt**: Header template for GCT files
+  - **sample_ID.txt**: table to match samples ID in circos plots
 - **Plots** 
   - **CreateHiresFiles.R**: Create files to plot high resolution images with enhanced BayesSpace spots
   - **HallmarkPlots.R**: Reproduce plots 
+  - **PanCancerHeatmap.R**: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
+  - **CancerCircos.R**: Plot results of Random Forest models for Cancer Hallmarks
+  - **TMECircos.R**: Plot results of Random Forest models for TME Hallmarks
 

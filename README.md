@@ -20,7 +20,6 @@ Code used for the collection of Cancer Hallmark gene sets and the computation of
 - Pan-Cancer heatmap
 - CNV estimation
 - Random Forest: Radar computation and RF models
-- Pathway activities and correlations
 - Plots
 - Supplementary
 - Utils (Annotation, Plot functions, compute real coordinates...) 

@@ -28,8 +28,8 @@ This is the updated code corresponding to our latest submitted manuscript (under
 - **Preprocess.R**: Preprocess samples, transform to SingleCellExperiment object and run clustering
 - **EnhanceST.R**: Use BayesSpace enhancing algorithm in Visium Spatial transcriptomics data
 - **GeneImputation.R**: Impute genes at sub-spot resolution
-- **GeneCollection.R**: Obtain hallmark signatures using Pathway Commons
-- **HallmarkScores.R**: Script to create a Seurat object from an enhanced SingleCellExperiment object
+- **GeneCollection.R**: Obtain hallmark gene-lists using Pathway Commons
+- **HallmarkScores.R**: Script to create a Seurat object from an enhanced SingleCellExperiment object and run AddmoduleScore on sub-spot resolution
 - **mat2GCT.sh**: Tranform expression matrix to GCT format
 - **ComputeESTIMATE.R**: Extract enhanced expression matrix and compute ESTIMATE scores at sub-spot resolution
 - **SpAutocorrelation**: Compute Moran's for hallmark activities at sub-spot resolution

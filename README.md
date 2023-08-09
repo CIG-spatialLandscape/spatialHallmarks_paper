@@ -8,7 +8,7 @@
 #### Authors: Mustafa Sibai* & Sergi Cervilla*
 \* Equal contribution
 
-This is the updated code corresponding to our latest submitted manuscript (under-review), which is used for the collection of Cancer Hallmark gene sets and the computation of their activities in enhanced Visium datasets from 58 samples across 10 cancer types with all downstream analysis. Our previous version of this study correspond to this preprint: doi: https://doi.org/10.1101/2022.06.18.496114  <br />
+This is the updated code corresponding to our latest submitted manuscript (under-review), which is used for the collection of Cancer Hallmark gene sets and the computation of their activities in enhanced Visium datasets from 63 samples across 10 cancer types with all downstream analysis. Our previous version of this study correspond to this preprint: doi: https://doi.org/10.1101/2022.06.18.496114  <br />
 
 ## Outline
 - SpaceRanger

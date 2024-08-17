@@ -53,19 +53,20 @@ coord <- coord[spot_info$spotid,]
 source("../utils/CoordinatesEnhanced.R")
 coord <- subspot_coord(coord)
 
-tme_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(4,5)]
-cancer_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(1,2)]
+tme_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(3,4,5)]
+cancer_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(1,2,3)]
 #compute distances across TME and Cancer spots
 coord <- coord[c(tme_spots, cancer_spots), c("realrow", "realcol")]
 distances <- as.matrix(dist(coord))
 distances <- distances[tme_spots, cancer_spots]
+distances <- distances + 1
 #create an empty data frame
 tmp <- c()
 #for each Cancer hallmark, apply the formula
 for (hallmark in paste0("H", c(2,4,8,9,10,11,12))) {
   print(paste0(hallmark, "_", x))
   tmp <- rbind(tmp, sapply(tme_spots, function(spot){
-    sum(1/distances[spot,]*spot_info[spot_info$estimate.cluster %in% c(1,2), hallmark])
+    sum(1/distances[spot,]*spot_info[spot_info$estimate.cluster %in% c(1,2,3), hallmark])
   }))
 }
 
@@ -80,4 +81,3 @@ tmp <- t(tmp)
 colnames(tmp) <- c("H2_radar", "H4_radar", "H8_radar", "H9_radar", "H10_radar", "H11_radar", "H12_radar", "H1", "H3", "H5", "H6","H7", "H13")
 
 write.table(tmp, "", sep = "\t")
-

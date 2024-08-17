@@ -54,8 +54,8 @@ source("../utils/CoordinatesEnhanced.R")
 coord <- subspot_coord(coord)
 
 
-tme_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(4,5)]
-cancer_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(1,2)]
+tme_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(3,4,5)]
+cancer_spots <- spot_info$spotid[spot_info$estimate.cluster %in% c(1,2,3)]
 #compute distances across TME and Cancer spots
 coord <- coord[c(tme_spots, cancer_spots), c("realrow", "realcol")]
 distances <- as.matrix(dist(coord))
@@ -66,7 +66,7 @@ tmp <- c()
 for (hallmark in paste0("H", c(1,3,5,6,7,13))) {
   print(paste0(hallmark, "_", x))
   tmp <- rbind(tmp, sapply(cancer_spots, function(spot){
-    sum(1/distances[, spot]*spot_info[spot_info$estimate.cluster %in% c(4,5), hallmark])
+    sum(1/distances[, spot]*spot_info[spot_info$estimate.cluster %in% c(3,4,5), hallmark])
   }))
 }
 
@@ -81,4 +81,3 @@ tmp <- t(tmp)
 colnames(tmp) <- c("H1_radar", "H3_radar", "H5_radar", "H6_radar","H7_radar", "H13_radar", "H2", "H4", "H8", "H9","H10", "H11", "H12")
 
 write.table(tmp, "", sep = "\t")
-

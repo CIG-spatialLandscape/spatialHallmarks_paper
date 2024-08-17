@@ -1,7 +1,13 @@
+##################################################
+## Project: Cancer Hallmarks
+## Script purpose: Get the canonical cell type markers from the panglao database
+## Author: Sergi Cervilla* & Mustafa Sibai*
+##################################################
+
 library(readr)
 library(dplyr)
 library(stringr)
-#filter to get human specific genes
+
 panglao <- read_tsv("https://panglaodb.se/markers/PanglaoDB_markers_27_Mar_2020.tsv.gz")
 
 ## Immune system
@@ -56,4 +62,4 @@ panglao_nervous <- panglao_nervous[sapply(panglao_nervous, length) >= 10]
 ## Main TME
 TME <- c(panglao_Vasculature, panglao_connective, panglao_immune, panglao_nervous)
 
-saveRDS(TME, file = "~/rnaseq/expression/ST/Hallmarks/TME_cells.rds")
+saveRDS(TME, file = "")

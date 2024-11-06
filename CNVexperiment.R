@@ -1,12 +1,104 @@
-library(stringr)
-library(tidyverse)
-
-
 ##################################################
 ## Project: Cancer Hallmarks
 ## Script purpose: Compute Radar scores of TME Hallmarks within Cancer spots
 ## Author: Sergi Cervilla* & Mustafa Sibai*
 ##################################################
+
+library(BayesSpace)
+library(stringr)
+library(tidyverse)
+library(infercnv)
+library(Seurat)
+
+
+### Run inferCNV
+options("Seurat.object.assay.version" = "v3")
+
+args = commandArgs(trailingOnly=TRUE)
+sample <- args[1]
+
+#assign estiamte scores to each sub-spot in the seurat object
+gct <- read.table(paste0("/estimate/output/output_", sample, ".gct"), sep = "\t", header = F, skip = 3)
+#cluster the estimate scores and sort them from cancer (1) to TME (5)
+labels <- kmeans(t(gct[3,3:ncol(gct)]), centers = 5)$cluster
+
+labels_order <- order(sapply(1:5, function(x){
+  mean(t(gct[3,3:ncol(gct)])[labels==x])
+}))
+
+new_labels <- function(original, order){
+  labels <- original
+  #Cancer (lowest)
+  labels[original==order[1]] <- "1"
+  labels[original==order[2]] <- "2"
+  labels[original==order[3]] <- "3"
+  labels[original==order[4]] <- "4"
+  #TME (highest)
+  labels[original==order[5]] <- "5"
+  return(labels)
+}
+
+ordered_labels <- new_labels(labels,labels_order)
+
+sce <- readRDS(paste0("/sce/", sample, "_sce_enhanced.rds"))
+sce <- sce[,-1]
+
+sce$ordered_label <- ordered_labels
+
+df <- colData(sce)
+
+max_voting <- function(v) {
+  v_1 <- cut(as.numeric(v), breaks = c(0,2.5,3.5, 5), labels = c("Cancer", "Buffer","TME"))
+  # Count the occurrences of each value
+  vote_counts <- table(v_1)
+  
+  # Find the maximum count(s)
+  max_count <- max(vote_counts)
+  
+  # Get the values with the maximum count
+  max_votes <- names(vote_counts[vote_counts == max_count])
+  if (length(max_votes)>1) return("Buffer")
+  return(max_votes)
+}
+
+max_voting(df$ordered_label)
+estimate_clus_spot <- df %>% as.data.frame() %>% 
+  group_by(spot.idx) %>% summarise(max=max_voting(ordered_label))
+
+STobject <- readRDS(paste0("/RDS/", sample, ".rds"))
+STobject$clus <- estimate_clus_spot$max
+
+Idents(STobject) <- "clus"
+STobject <- subset(STobject, ident=c("TME", "Cancer"))
+
+
+path_infer <- ""
+if (!file.exists(paste0(path_infer, sample, "/"))) dir.create(paste0(path_infer, sample, "/"))
+
+STobject$spot <- colnames(STobject)
+write.table(STobject@meta.data[,c("spot","clus"), drop=F], paste0(path_infer, sample, "/annot.tsv"), sep = "\t", row.names = F,
+            col.names = F, quote = F)
+
+
+object_infCNV <- infercnv::CreateInfercnvObject(raw_counts_matrix=as.matrix(STobject@assays$RNA@counts), 
+                                                gene_order_file=paste0(path_infer, "genes_order.txt"),
+                                                annotations_file=paste0(path_infer, sample, "/annot.tsv"),
+                                                delim="\t",
+                                                ref_group_names=c("TME"), 
+                                                chr_exclude = c("chrM")) 
+
+options(scipen = 100)
+rm(STobject, sce, gct)
+
+object_infCNV = run(object_infCNV,  num_threads = 1,
+                    cutoff=0.1, #(see infercnv::run documentation)
+                    out_dir=paste0(path_infer, sample, "/output_bayes"),
+                    cluster_by_groups=F, plot_steps=T, denoise=T,  no_prelim_plot=F, k_obs_groups = 1, HMM=T, leiden_resolution = 0.005, BayesMaxPNormal=0.2) #denoising applies noise reduction for the plot
+
+
+
+
+### Analysis at sub-spot level 
 
 samples <- list.files("")
 

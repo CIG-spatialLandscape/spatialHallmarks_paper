@@ -33,7 +33,7 @@ This is the updated code corresponding to our latest submitted manuscript (under
 - **mat2GCT.sh**: Tranform expression matrix to GCT format
 - **ComputeESTIMATE.R**: Extract enhanced expression matrix and compute ESTIMATE scores at sub-spot resolution
 - **SpAutocorrelation**: Compute Moran's for hallmark activities at sub-spot resolution
-- **CNVexperiment.R**: Generate CNV clusters and run CNV experiment at spot level and transfer to sub-spot level
+- **CNVexperiment.R**: Generate CNV clusters, run CNV experiment at spot level and transfer to sub-spot level
 - **CancerRadar.R**: Compute TME Radar scores for Cancer sub-spots
 - **TMERadar.R**: Compute Cancer Radar scores for TME sub-spots
 - **RFCancer.R**: Generate Random Forest model to predict a given Cancer Hallmark in a given sample at sub-spot resolution
@@ -47,6 +47,5 @@ This is the updated code corresponding to our latest submitted manuscript (under
   - **sample_ID.txt**: table to match samples ID in circos plots
 - **Plots** 
   - **CreateHiresFiles.R**: Create files to plot high resolution images with enhanced BayesSpace sub-spots
-  - **HallmarkPlots.R**: Reproduce plots 
   - **PanCancerHeatmap.R**: Plot a heatmap representing and the hallmark activity within each ESTIMATE cluster
  
